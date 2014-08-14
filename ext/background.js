@@ -325,7 +325,6 @@
   {
     tabs.forEach(function(tab)
     {
-      return
       chrome.webNavigation.getAllFrames(
       {
         tabId: tab.id
