@@ -116,6 +116,7 @@
   ext.pages = {
     open: function(url, callback)
     {
+      console.log('pages.open');
       if (callback)
       {
         chrome.tabs.create(
@@ -125,13 +126,15 @@
         {
           var onUpdated = function(tabId, changeInfo, tab)
           {
+            console.log('pages.open onUpdated');
             if (tabId == openedTab.id && changeInfo.status == "complete")
             {
               chrome.tabs.onUpdated.removeListener(onUpdated);
               callback(new Page(tab));
             }
           };
-          chrome.tabs.onUpdated.addListener(onUpdated);
+          console.log('pages.open before onUpdated listener');
+          //chrome.tabs.onUpdated.addListener(onUpdated);
         });
       }
       else
@@ -320,16 +323,20 @@
     onBeforeRequest: new ext._EventTarget(true),
     handlerBehaviorChanged: chrome.webRequest.handlerBehaviorChanged
   };
+  console.log('aaaaa');
   chrome.tabs.query(
   {}, function(tabs)
   {
+    console.log('TOM: tabs query');
     tabs.forEach(function(tab)
     {
+      console.log('TOM: before getAllFrames');
       chrome.webNavigation.getAllFrames(
       {
         tabId: tab.id
       }, function(details)
       {
+        console.log('TOM: getAllFrames', details);
         if (details && details.length > 0)
         {
           var frames = framesOfTabs[tab.id] = {
@@ -354,6 +361,7 @@
       });
     });
   });
+  console.log('top webrequest before adddlistener');
   chrome.webRequest.onBeforeRequest.addListener(function(details)
   {
     try
@@ -413,8 +421,10 @@
   {
     urls: ["<all_urls>"]
   }, ["blocking"]);
+  console.log('top runtime.onMessage before adddlistener');
   chrome.runtime.onMessage.addListener(function(message, rawSender, sendResponse)
   {
+    console.log('onMessage.addListener', message, rawSender);
     var sender = {
       page: new Page(rawSender.tab),
       frame: {
@@ -439,5 +449,8 @@
     };
     return ext.onMessage._dispatch(message, sender, sendResponse);
   });
-  ext.storage = localStorage;
+  console.log('aaaaa 1');
+  //KITTHACK: no localstorage
+  ext.storage = {}//localStorage;
+  console.log('localStorage');
 })();

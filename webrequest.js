@@ -49,6 +49,7 @@ FilterNotifier.addListener(function(action)
 
 function onBeforeRequest(url, type, page, frame)
 {
+  console.log('onBeforeRequest', url, type, page, frame);
   if (isFrameWhitelisted(page, frame))
     return true;
 

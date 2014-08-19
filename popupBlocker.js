@@ -38,7 +38,9 @@ if (require("info").platform == "chromium")
     checkPotentialPopup(details.tabId, details.url, openerUrl);
   });
 
-  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
+  console.log('popupBlocker before tabs.onUpdated');
+
+  /*chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
   {
     if (!(tabId in tabsLoading))
     {
@@ -51,7 +53,7 @@ if (require("info").platform == "chromium")
 
     if ("status" in changeInfo && changeInfo.status == "complete" && tab.url != "about:blank")
       delete tabsLoading[tabId];
-  });
+  });*/
 }
 
 function checkPotentialPopup(tabId, url, opener)

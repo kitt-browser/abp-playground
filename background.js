@@ -122,6 +122,7 @@ var contextMenuItem = {
 // Adds or removes browser action icon according to options.
 function refreshIconAndContextMenu(page)
 {
+  console.log('refreshIconAndContextMenu');
   var whitelisted = isWhitelisted(page.url);
 
   var iconFilename;
@@ -514,6 +515,8 @@ ext.onMessage.addListener(function (msg, sender, sendResponse)
     case "get-selectors":
       var selectors = [];
 
+      console.log('get-selectors', msg, sender);
+
       if (!isFrameWhitelisted(sender.page, sender.frame, "DOCUMENT") &&
           !isFrameWhitelisted(sender.page, sender.frame, "ELEMHIDE"))
       {
@@ -541,6 +544,7 @@ ext.onMessage.addListener(function (msg, sender, sendResponse)
       sendResponse(selectors);
       break;
     case "should-collapse":
+      console.log('should-collapse');
       if (isFrameWhitelisted(sender.page, sender.frame, "DOCUMENT"))
       {
         sendResponse(false);
@@ -566,6 +570,7 @@ ext.onMessage.addListener(function (msg, sender, sendResponse)
       // The browser action popup asks us this.
       if(sender.page)
       {
+        console.log('get-domain-enabled-state');
         sendResponse({enabled: !isWhitelisted(sender.page.url)});
         return;
       }
