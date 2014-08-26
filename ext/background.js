@@ -253,8 +253,10 @@
       lastFocusedWindow: true
     }, function(tabs)
     {
+      console.log('before removeAll');
       chrome.contextMenus.removeAll(function()
       {
+        console.log('removeAll callback');
         contextMenuUpdating = false;
         if (tabs.length == 0)
         {

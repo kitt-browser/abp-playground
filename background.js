@@ -59,20 +59,27 @@ require("filterNotifier").FilterNotifier.addListener(function(action)
 {
   if (action == "load")
   {
+    console.log('LOAD filters');
     var importingOldData = importOldData();
 
     var addonVersion = require("info").addonVersion;
     var prevVersion = ext.storage.currentVersion;
 
+    console.log('load filters', FilterStorage.firstRun, FilterStorage.subscriptions.length);
+
     // There are no filters stored so we need to reinitialize all filterlists
     if (!FilterStorage.firstRun && FilterStorage.subscriptions.length === 0)
     {
+      console.log('1');
       filterlistsReinitialized = true;
       prevVersion = null;
     }
 
+    console.log('load filters', prevVersion);
+
     if (prevVersion != addonVersion || FilterStorage.firstRun)
     {
+      console.log('2');
       seenDataCorruption = prevVersion && FilterStorage.firstRun;
       ext.storage.currentVersion = addonVersion;
       if (!importingOldData)
@@ -160,6 +167,8 @@ function refreshIconAndContextMenuForAllPages()
  */
 function importOldData()
 {
+  //KITTHACK
+  return false;
   if ("patterns.ini" in localStorage)
   {
     FilterStorage.loadFromDisk(localStorage["patterns.ini"]);
@@ -183,6 +192,7 @@ function importOldData()
  */
 function addSubscription(prevVersion)
 {
+  console.log('addSubscription', prevVersion);
   // Make sure to remove "Recommended filters", no longer necessary
   var toRemove = "https://easylist-downloads.adblockplus.org/chrome_supplement.txt";
   if (toRemove in FilterStorage.knownSubscriptions)
@@ -243,6 +253,8 @@ function addSubscription(prevVersion)
     }
   }
 
+  console.log('aaaaaaaaaa', addSubscription, addAcceptable);
+
   if (!addSubscription && !addAcceptable)
     return;
 
@@ -253,11 +265,13 @@ function addSubscription(prevVersion)
 
   if (addSubscription)
   {
+    console.log('XHR to load filters');
     // Load subscriptions data
     var request = new XMLHttpRequest();
     request.open("GET", "subscriptions.xml");
     request.addEventListener("load", function()
     {
+      console.log('XHR LOAD EVENT', request.responseXML);
       var node = Utils.chooseFilterSubscription(request.responseXML.getElementsByTagName("subscription"));
       var subscription = (node ? Subscription.fromURL(node.getAttribute("url")) : null);
       if (subscription)
@@ -271,6 +285,9 @@ function addSubscription(prevVersion)
 
           notifyUser();
       }
+    }, false);
+    request.addEventListener("error", function() {
+      console.log('XHR to load filters ERROR', arguments);
     }, false);
     request.send(null);
   }

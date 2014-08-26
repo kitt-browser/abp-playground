@@ -22,7 +22,10 @@ var onFilterChangeTimeout = null;
 function onFilterChange()
 {
   onFilterChangeTimeout = null;
-  ext.webRequest.handlerBehaviorChanged();
+  //KITTHACK
+  ext.webRequest.handlerBehaviorChanged(function() {
+    console.log('handle behavior changed', arguments);
+  });
 }
 
 var importantNotifications = {
@@ -60,6 +63,8 @@ function onBeforeRequest(url, type, page, frame)
     docDomain,
     isThirdParty(extractHostFromURL(url), docDomain)
   );
+
+  console.log('onBeforeRequest filter', url, filter);
 
   // We can't listen to onHeadersReceived in Safari so we need to
   // check for notifications here
