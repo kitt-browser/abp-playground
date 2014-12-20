@@ -368,11 +368,15 @@
   {
     try
     {
+      //console.log('  >>> onBeforeRequest -> details url:', details.url)
       if (details.tabId == -1)
       {
         return;
       }
       var isMainFrame = details.type == "main_frame" || details.frameId == 0 && !(details.tabId in framesOfTabs);
+      console.log('  >>> URL', details.url);
+      console.log('  >>> frame id', details.frameId);
+      console.log('  >>> main frame', isMainFrame);
       var frames = null;
       if (!isMainFrame)
       {
@@ -390,18 +394,24 @@
         var frameId;
         if (details.type == "sub_frame")
         {
+          console.log('  >>> sub_frame');
           frameId = details.parentFrameId;
         }
         else
         {
+          console.log('  >>> not sub_frame', details.type);
           frameId = details.frameId;
         }
         frame = frames[frameId] || frames[Object.keys(frames)[0]];
+        console.log('  >>> frames', JSON.stringify(frames, null, 2));
+        console.log('  >>>', frameId);
+        console.log('  >>> DETAILS URL:', JSON.stringify(details, null, 2), "frame:", JSON.stringify(frame, null, 2));
         if (frame && !ext.webRequest.onBeforeRequest._dispatch(details.url, details.type, new Page(
         {
           id: details.tabId
         }), frame))
         {
+          console.log('  >> CANCELLING web request to', details.URL);
           return {
             cancel: true
           };
@@ -409,6 +419,7 @@
       }
       if (isMainFrame || details.type == "sub_frame")
       {
+        console.log('  >>> main frame or subframe');
         frames[details.frameId] = {
           url: details.url,
           parent: frame

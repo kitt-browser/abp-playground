@@ -269,10 +269,12 @@ function addSubscription(prevVersion)
     // Load subscriptions data
     var request = new XMLHttpRequest();
     request.open("GET", "subscriptions.xml");
+    //request.setRequestHeader('Content-Type', 'application/xml');
     request.addEventListener("load", function()
     {
-      console.log('XHR LOAD EVENT', request.responseXML);
-      var node = Utils.chooseFilterSubscription(request.responseXML.getElementsByTagName("subscription"));
+      //console.log('XHR LOAD EVENT', request, request.getAllResponseHeaders());
+      var doc = (new DOMParser()).parseFromString(request.response, "application/xml");
+      var node = Utils.chooseFilterSubscription(doc);
       var subscription = (node ? Subscription.fromURL(node.getAttribute("url")) : null);
       if (subscription)
       {
