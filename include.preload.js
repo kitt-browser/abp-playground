@@ -97,6 +97,7 @@ function checkCollapse(event)
     if (!url)
       return;
 
+    console.log("sendMessage -> should-collapse", event);
     ext.backgroundPage.sendMessage(
       {
         type: "should-collapse",
@@ -106,6 +107,7 @@ function checkCollapse(event)
 
       function(response)
       {
+        console.log("response to should collapse");
         if (response && target.parentNode)
         {
           // <frame> cannot be removed, doing that will mess up the frameset

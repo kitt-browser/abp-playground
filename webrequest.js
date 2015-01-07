@@ -64,8 +64,6 @@ function onBeforeRequest(url, type, page, frame)
     isThirdParty(extractHostFromURL(url), docDomain)
   );
 
-  console.log('onBeforeRequest filter', url, filter);
-
   // We can't listen to onHeadersReceived in Safari so we need to
   // check for notifications here
   if (platform != "chromium" && type == "sub_frame")
@@ -75,7 +73,10 @@ function onBeforeRequest(url, type, page, frame)
       showNotification(notificationToShow);
   }
 
-  FilterNotifier.triggerListeners("filter.hitCount", filter, 0, 0, page);
+  console.log('onBeforeRequest filter', url, filter, (filter instanceof BlockingFilter));
+
+  //FilterNotifier.triggerListeners("filter.hitCount", filter, 0, 0, page);
+  console.log("onBeforeRequest return " , url, !(filter instanceof BlockingFilter));
   return !(filter instanceof BlockingFilter);
 }
 

@@ -406,16 +406,19 @@
         console.log('  >>> frames', JSON.stringify(frames, null, 2));
         console.log('  >>>', frameId);
         console.log('  >>> DETAILS URL:', JSON.stringify(details, null, 2), "frame:", JSON.stringify(frame, null, 2));
-        if (frame && !ext.webRequest.onBeforeRequest._dispatch(details.url, details.type, new Page(
+        var shouldCancel = (frame && !ext.webRequest.onBeforeRequest._dispatch(details.url, details.type, new Page(
         {
           id: details.tabId
-        }), frame))
-        {
+        }), frame));
+        console.log("Should cancel", shouldCancel, frame, details);
+        if (shouldCancel) {
           console.log('  >> CANCELLING web request to', details.URL);
           return {
             cancel: true
           };
-        }
+        } else {
+          console.log("NOT CANCELLING REQUEST", details.URL);
+       }
       }
       if (isMainFrame || details.type == "sub_frame")
       {
