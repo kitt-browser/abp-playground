@@ -27,15 +27,18 @@ var SELECTOR_GROUP_SIZE = 20;
 // also we must not create the shadow root in the response callback passed
 // to sendMessage(), otherwise Chrome breaks some websites (#450)
 var shadow = null;
-if ("webkitCreateShadowRoot" in document.documentElement && !/\bChrome\/3[1-3]\b/.test(navigator.userAgent))
+/*if ("webkitCreateShadowRoot" in document.documentElement && !/\bChrome\/3[1-3]\b/.test(navigator.userAgent))
 {
   shadow = document.documentElement.webkitCreateShadowRoot();
   shadow.appendChild(document.createElement("shadow"));
-}
+}*/
+
+var id = Math.random().toString(36).substr(2, 5);
 
 // Sets the currently used CSS rules for elemhide filters
 function setElemhideCSSRules(selectors)
 {
+  console.log(id, 'Content, selectors.length = ' + selectors.length);
   if (selectors.length == 0)
     return;
 
@@ -69,10 +72,15 @@ function setElemhideCSSRules(selectors)
 
   // WebKit apparently chokes when the selector list in a CSS rule is huge.
   // So we split the elemhide selectors into groups.
-  for (var i = 0; selectors.length > 0; i++)
+  for (var i = 0; selectors.length > 0; )
   {
     var selector = selectors.splice(0, SELECTOR_GROUP_SIZE).join(", ");
-    style.sheet.insertRule(selector + " { display: none !important; }", i);
+    try {
+      style.sheet.insertRule(selector + " { display: none !important; }", i);
+      i += 1;
+    } catch (ex) {
+      console.log('Injection of selectors ', selectors, ' failed ', ex);
+    }
   }
 }
 
@@ -97,7 +105,7 @@ function checkCollapse(event)
     if (!url)
       return;
 
-    console.log("sendMessage -> should-collapse", event);
+    console.log(id, "sendMessage -> should-collapse", event, target, tag);
     ext.backgroundPage.sendMessage(
       {
         type: "should-collapse",
@@ -107,7 +115,7 @@ function checkCollapse(event)
 
       function(response)
       {
-        console.log("response to should collapse");
+        console.log(id, "response to should collapse", response);
         if (response && target.parentNode)
         {
           // <frame> cannot be removed, doing that will mess up the frameset
@@ -168,3 +176,5 @@ if (document.documentElement)
   init();
 else
   window.setTimeout(init, 0);
+
+console.log(id, 'Content script injected into iFrame', window.location.href.toString(), ' with parent', window.parent.location.href.toString());

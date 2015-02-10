@@ -41,18 +41,6 @@
         "https://*/*"
       ], 
       "run_at": "document_start"
-    }, 
-    {
-      "all_frames": true, 
-      "js": [
-        "include.postload.js"
-      ], 
-      "match_about_blank": true, 
-      "matches": [
-        "http://*/*", 
-        "https://*/*"
-      ], 
-      "run_at": "document_end"
     }
   ], 
   "default_locale": "en_US", 

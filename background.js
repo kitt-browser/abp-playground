@@ -40,8 +40,8 @@ var defaultMatcher = require("matcher").defaultMatcher;
 var Prefs = require("prefs").Prefs;
 var Synchronizer = require("synchronizer").Synchronizer;
 var Utils = require("utils").Utils;
-var Notification = require("notification").Notification;
-var initAntiAdblockNotification = require("antiadblockInit").initAntiAdblockNotification;
+//var Notification = require("notification").Notification;
+//var initAntiAdblockNotification = require("antiadblockInit").initAntiAdblockNotification;
 
 // Some types cannot be distinguished
 RegExpFilter.typeMap.OBJECT_SUBREQUEST = RegExpFilter.typeMap.OBJECT;
@@ -59,42 +59,40 @@ require("filterNotifier").FilterNotifier.addListener(function(action)
 {
   if (action == "load")
   {
-    console.log('LOAD filters');
+    //console.log('LOAD filters');
     var importingOldData = importOldData();
 
     var addonVersion = require("info").addonVersion;
     var prevVersion = ext.storage.currentVersion;
 
-    console.log('load filters', FilterStorage.firstRun, FilterStorage.subscriptions.length);
+    //console.log('load filters', FilterStorage.firstRun, FilterStorage.subscriptions.length);
 
     // There are no filters stored so we need to reinitialize all filterlists
     if (!FilterStorage.firstRun && FilterStorage.subscriptions.length === 0)
     {
-      console.log('1');
       filterlistsReinitialized = true;
       prevVersion = null;
     }
 
-    console.log('load filters', prevVersion);
+    //console.log('load filters', prevVersion);
 
     if (prevVersion != addonVersion || FilterStorage.firstRun)
     {
-      console.log('2');
       seenDataCorruption = prevVersion && FilterStorage.firstRun;
       ext.storage.currentVersion = addonVersion;
       if (!importingOldData)
         addSubscription(prevVersion);
     }
 
-    if (canUseChromeNotifications)
-      initChromeNotifications();
-    initAntiAdblockNotification();
+    //if (canUseChromeNotifications)
+      //initChromeNotifications();
+    //initAntiAdblockNotification();
   }
 
   // update browser actions when whitelisting might have changed,
   // due to loading filters or saving filter changes
-  if (action == "load" || action == "save")
-    refreshIconAndContextMenuForAllPages();
+  //if (action == "load" || action == "save")
+  //  refreshIconAndContextMenuForAllPages();
 });
 
 // Special-case domains for which we cannot use style-based hiding rules.
@@ -114,6 +112,7 @@ function removeDeprecatedOptions()
 // Remove deprecated options before we do anything else.
 removeDeprecatedOptions();
 
+/*
 var activeNotification = null;
 
 var contextMenuItem = {
@@ -159,7 +158,7 @@ function refreshIconAndContextMenuForAllPages()
     pages.forEach(refreshIconAndContextMenu);
   });
 }
-
+*/
 /**
  * Old versions for Opera stored patterns.ini in the localStorage object, this
  * will import it into FilterStorage properly.
@@ -253,7 +252,7 @@ function addSubscription(prevVersion)
     }
   }
 
-  console.log('aaaaaaaaaa', addSubscription, addAcceptable);
+  //console.log('aaaaaaaaaa', addSubscription, addAcceptable);
 
   if (!addSubscription && !addAcceptable)
     return;
@@ -265,7 +264,7 @@ function addSubscription(prevVersion)
 
   if (addSubscription)
   {
-    console.log('XHR to load filters');
+    //console.log('XHR to load filters');
     // Load subscriptions data
     var request = new XMLHttpRequest();
     request.open("GET", "subscriptions.xml");
@@ -289,7 +288,7 @@ function addSubscription(prevVersion)
       }
     }, false);
     request.addEventListener("error", function() {
-      console.log('XHR to load filters ERROR', arguments);
+      //console.log('XHR to load filters ERROR', arguments);
     }, false);
     request.send(null);
   }
@@ -297,11 +296,13 @@ function addSubscription(prevVersion)
     notifyUser();
 }
 
+/*
 Prefs.addListener(function(name)
 {
   if (name == "shouldShowBlockElementMenu")
     refreshIconAndContextMenuForAllPages();
 });
+*/
 
 /**
   * Opens options page or focuses an existing one, within the last focused window.
@@ -330,6 +331,7 @@ function openOptions(callback)
   });
 }
 
+/*
 function prepareNotificationIconAndPopup()
 {
   var animateIcon = (activeNotification.type !== "question");
@@ -499,11 +501,12 @@ function showNotification(notification)
   }
   prepareNotificationIconAndPopup();
 }
+*/
 
 // This is a hack to speedup loading of the options page on Safari.
 // Once we replaced the background page proxy with message passing
 // this global function should removed.
-function getUserFilters()
+/*function getUserFilters()
 {
   var filters = [];
   var exceptions = [];
@@ -526,6 +529,7 @@ function getUserFilters()
 
   return {filters: filters, exceptions: exceptions};
 }
+*/
 
 ext.onMessage.addListener(function (msg, sender, sendResponse)
 {
@@ -626,15 +630,18 @@ ext.onMessage.addListener(function (msg, sender, sendResponse)
 });
 
 // update icon when page changes location
-ext.pages.onLoading.addListener(function(page)
+/*ext.pages.onLoading.addListener(function(page)
 {
   page.sendMessage({type: "clickhide-deactivate"});
   refreshIconAndContextMenu(page);
 });
+*/
 
+/*
 setTimeout(function()
 {
   var notificationToShow = Notification.getNextToShow();
   if (notificationToShow)
     showNotification(notificationToShow);
 }, 3 * 60 * 1000);
+*/

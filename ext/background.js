@@ -116,7 +116,7 @@
   ext.pages = {
     open: function(url, callback)
     {
-      console.log('pages.open');
+      //console.log('pages.open');
       if (callback)
       {
         chrome.tabs.create(
@@ -126,14 +126,14 @@
         {
           var onUpdated = function(tabId, changeInfo, tab)
           {
-            console.log('pages.open onUpdated');
+            //console.log('pages.open onUpdated');
             if (tabId == openedTab.id && changeInfo.status == "complete")
             {
               chrome.tabs.onUpdated.removeListener(onUpdated);
               callback(new Page(tab));
             }
           };
-          console.log('pages.open before onUpdated listener');
+          //console.log('pages.open before onUpdated listener');
           //chrome.tabs.onUpdated.addListener(onUpdated);
         });
       }
@@ -325,20 +325,20 @@
     onBeforeRequest: new ext._EventTarget(true),
     handlerBehaviorChanged: chrome.webRequest.handlerBehaviorChanged
   };
-  console.log('aaaaa');
+  //console.log('aaaaa');
   chrome.tabs.query(
   {}, function(tabs)
   {
-    console.log('TOM: tabs query');
+    //console.log('TOM: tabs query');
     tabs.forEach(function(tab)
     {
-      console.log('TOM: before getAllFrames');
+      //console.log('TOM: before getAllFrames');
       chrome.webNavigation.getAllFrames(
       {
         tabId: tab.id
       }, function(details)
       {
-        console.log('TOM: getAllFrames', details);
+        //console.log('TOM: getAllFrames', details);
         if (details && details.length > 0)
         {
           var frames = framesOfTabs[tab.id] = {
@@ -374,9 +374,9 @@
         return;
       }
       var isMainFrame = details.type == "main_frame" || details.frameId == 0 && !(details.tabId in framesOfTabs);
-      console.log('  >>> URL', details.url);
-      console.log('  >>> frame id', details.frameId);
-      console.log('  >>> main frame', isMainFrame);
+      //console.log('  >>> URL', details.url);
+      //console.log('  >>> frame id', details.frameId);
+      //console.log('  >>> main frame', isMainFrame);
       var frames = null;
       if (!isMainFrame)
       {
@@ -394,35 +394,35 @@
         var frameId;
         if (details.type == "sub_frame")
         {
-          console.log('  >>> sub_frame');
+          //console.log('  >>> sub_frame');
           frameId = details.parentFrameId;
         }
         else
         {
-          console.log('  >>> not sub_frame', details.type);
+          //console.log('  >>> not sub_frame', details.type);
           frameId = details.frameId;
         }
         frame = frames[frameId] || frames[Object.keys(frames)[0]];
-        console.log('  >>> frames', JSON.stringify(frames, null, 2));
-        console.log('  >>>', frameId);
-        console.log('  >>> DETAILS URL:', JSON.stringify(details, null, 2), "frame:", JSON.stringify(frame, null, 2));
+        //console.log('  >>> frames', JSON.stringify(frames, null, 2));
+        //console.log('  >>>', frameId);
+        //console.log('  >>> DETAILS URL:', JSON.stringify(details, null, 2), "frame:", JSON.stringify(frame, null, 2));
         var shouldCancel = (frame && !ext.webRequest.onBeforeRequest._dispatch(details.url, details.type, new Page(
         {
           id: details.tabId
         }), frame));
-        console.log("Should cancel", shouldCancel, frame, details);
+        //console.log("Should cancel", shouldCancel, frame, details);
         if (shouldCancel) {
-          console.log('  >> CANCELLING web request to', details.URL);
+          //console.log('  >> CANCELLING web request to', details.URL);
           return {
             cancel: true
           };
         } else {
-          console.log("NOT CANCELLING REQUEST", details.URL);
+          //console.log("NOT CANCELLING REQUEST", details.URL);
        }
       }
       if (isMainFrame || details.type == "sub_frame")
       {
-        console.log('  >>> main frame or subframe');
+        //console.log('  >>> main frame or subframe');
         frames[details.frameId] = {
           url: details.url,
           parent: frame
@@ -465,8 +465,8 @@
     };
     return ext.onMessage._dispatch(message, sender, sendResponse);
   });
-  console.log('aaaaa 1');
+  //console.log('aaaaa 1');
   //KITTHACK: no localstorage
   ext.storage = {}//localStorage;
-  console.log('localStorage');
+  //console.log('localStorage');
 })();

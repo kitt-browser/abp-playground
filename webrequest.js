@@ -15,6 +15,8 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+"use strict";
+
 var FilterNotifier = require("filterNotifier").FilterNotifier;
 var platform = require("info").platform;
 
@@ -24,7 +26,7 @@ function onFilterChange()
   onFilterChangeTimeout = null;
   //KITTHACK
   ext.webRequest.handlerBehaviorChanged(function() {
-    console.log('handle behavior changed', arguments);
+    //console.log('handle behavior changed', arguments);
   });
 }
 
@@ -66,14 +68,14 @@ function onBeforeRequest(url, type, page, frame)
 
   // We can't listen to onHeadersReceived in Safari so we need to
   // check for notifications here
-  if (platform != "chromium" && type == "sub_frame")
+  /*if (platform != "chromium" && type == "sub_frame")
   {
     var notificationToShow = Notification.getNextToShow(url);
     if (notificationToShow)
       showNotification(notificationToShow);
-  }
+  }*/
 
-  console.log('onBeforeRequest filter', url, filter, (filter instanceof BlockingFilter));
+  //console.log('onBeforeRequest filter', url, filter, (filter instanceof BlockingFilter));
 
   //FilterNotifier.triggerListeners("filter.hitCount", filter, 0, 0, page);
   console.log("onBeforeRequest return " , url, !(filter instanceof BlockingFilter));
@@ -84,7 +86,7 @@ ext.webRequest.onBeforeRequest.addListener(onBeforeRequest);
 
 if (platform == "chromium")
 {
-  function onHeadersReceived(details)
+  var onHeadersReceived = function(details)
   {
     if (details.tabId == -1)
       return;
@@ -105,9 +107,10 @@ if (platform == "chromium")
         processKeyException(header.value, page, frame);
     }
 
+    /*
     var notificationToShow = Notification.getNextToShow(details.url);
     if (notificationToShow)
-      showNotification(notificationToShow);
+      showNotification(notificationToShow);*/
   }
 
   chrome.webRequest.onHeadersReceived.addListener(onHeadersReceived, {urls: ["<all_urls>"]}, ["responseHeaders"]);
