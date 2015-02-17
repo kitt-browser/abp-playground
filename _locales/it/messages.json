@@ -27,16 +27,13 @@
     "message": "Dopo la chiusura di questo pop-up, cliccate (o clic destro) su un elemento sulla pagina."
   },
   "description_chrome": {
-    "message": "Lo strumento blocca-pubblicità gratuito per Chrome: Blocca la pubblicità indesiderate su YouTube, Facebook e molti altri siti."
+    "message": "Estensione gratuita per Chrome, usata da oltre 50 milioni persone, blocca TUTTE le pubblicità fastidiose, malware e tracking."
   },
   "description_opera": {
-    "message": "Lo strumento blocca-pubblicità gratuito per Opera: Blocca la pubblicità indesiderate su YouTube, Facebook e molti altri siti."
+    "message": "Estensione gratuita per Opera, usata da oltre 50 milioni persone, blocca TUTTE le pubblicità fastidiose, malware e tracking."
   },
   "description_safari": {
-    "message": "Lo strumento blocca-pubblicità gratuito per Safari: Blocca la pubblicità indesiderate su YouTube, Facebook e molti altri siti."
-  },
-  "disable_inline": {
-    "message": "Disabilita la pubblicità integrata nel testo"
+    "message": "Estensione gratuita per Safari, usata da oltre 50 milioni persone, blocca TUTTE le pubblicità fastidiose, malware e tracking."
   },
   "disabled_for_site": {
     "message": "<strong>Disattivato</strong> su questo sito"
@@ -185,6 +182,14 @@
   "global_subscription_invalid_location": {
     "message": "Attenzione: per poter aggiungere una sottoscrizione è necessario che i campi 'Titolo della sottoscrizione:' ed 'Indirizzo della lista dei filtri:' non siano lasciati vuoti e corrispondano a nomi di file validi. Inserire tali dati e ripetere la procedura"
   },
+  "invalid_css_selector": {
+    "message": "$selector$ non è un selettore CSS valido",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "Ultimo aggiornamento alle $time$ del $date$",
     "placeholders": {
@@ -200,6 +205,14 @@
     "message": "Ultimo aggiornamento alle $time$ di oggi",
     "placeholders": {
       "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "line": {
+    "message": "Linea $number$",
+    "placeholders": {
+      "number": {
         "content": "$1"
       }
     }
@@ -224,9 +237,6 @@
   },
   "out_of_date_lists": {
     "message": "Le liste scadute verranno aggiornate automaticamente."
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "Nascondi gli elementi bloccati"
   },
   "overlay_notification_button_close": {
     "message": "Chiudi"
@@ -295,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Titolo della sottoscrizione:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Le intestazioni dell'elenco dei filtri non sono ammesse qui"
   },
   "update_now": {
     "message": "Aggiorna adesso"

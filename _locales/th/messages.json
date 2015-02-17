@@ -27,16 +27,8 @@
     "message": "หลังจากปิดป๊อปอัพแล้ว ให้คลิก (หรือคลิกขวา) องค์ประกอบบนเพจ"
   },
   "description_chrome": {
-    "message": "โปรแกรมบล็อกโฆษณาฟรีสำหรับ Chrome: บล็อกโฆษณาที่น่ากวนใจต่างๆ ทั้ง คลิปโฆษณาของ YouTube, โฆษณาบน Facebook, แบนเนอร์บนเว็บ และอื่นๆ…"
-  },
-  "description_opera": {
-    "message": "เครื่องมือบล็อกโฆษณาสำหรับ Safari: บล็อกโฆษณาต่างๆเช่น คลิปโฆษณาบน Youtube, โฆษณาของ Facebook, ป้ายแบนเนอน์ต่างๆ และอื่นๆอีกมากมาย."
-  },
-  "description_safari": {
-    "message": "เครื่องมือบล็อกโฆษณาสำหรับ Safari: บล็อกโฆษณาต่างๆ เช่น คลิปโฆษณาบน Youtube, โฆษณาของ Facebook, ป้ายแบนเนอร์ต่างๆ และอื่นๆ อีกมากมาย"
-  },
-  "disable_inline": {
-    "message": "ปิดใช้งานข้อความโฆษณาแบบในบรรทัด"
+    "description": "Note: this cannot be longer than 132 characters",
+    "message": "Used by over 50 million people, a free ad blocker for Chrome that blocks ALL annoying ads, malware and tracking."
   },
   "disabled_for_site": {
     "message": "<strong>เปิด</strong>บนเว็บไซต์นี้"
@@ -186,6 +178,15 @@
   "name": {
     "message": "Adblock Plus"
   },
+  "name_devbuild": {
+    "message": "Adblock Plus development build"
+  },
+  "notification_with_buttons": {
+    "message": "คลิ๊ก 'ตกลง' เพื่อเปิดลิ้งก์ทั้งหมดในการแจ้งเตือนนี้"
+  },
+  "notification_without_buttons": {
+    "message": "คลิ๊กบนการแจ้งเตือนเพื่อเปิดลิ้งก์ทั้งหมด"
+  },
   "options": {
     "message": "ตัวเลือกของ Adblock Plus"
   },
@@ -194,9 +195,6 @@
   },
   "out_of_date_lists": {
     "message": "รายการที่ล้าสมัยจะได้รับการอัปเดตเป็นระยะ ๆ"
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "ซ่อนตำแหน่งตัวยึดตำแหน่งขององค์ประกอบที่ถูกบล็อคไว้"
   },
   "remove_button": {
     "message": "ลบสิ่งที่เลือก"
@@ -258,7 +256,7 @@
     "message": "ชื่อ:"
   },
   "update_now": {
-    "message": "อัปเดตเลย"
+    "message": "อัพเดทเดี๋ยวนี้"
   },
   "whitelisted_domains": {
     "message": "โดเมนที่ขึ้นบัญชีขาว"

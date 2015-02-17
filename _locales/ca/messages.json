@@ -27,16 +27,8 @@
     "message": "Després de tancar aquest Pop-up, clica (o fes clic amb el botó dret) a un element de la pàgina."
   },
   "description_chrome": {
-    "message": "L'eina gratuita antianuncis del Chrome: Bloqueja anuncis molestos de vídeo al YouTube, anuncis del Facebook, bàners i molt més."
-  },
-  "description_opera": {
-    "message": "L'eina gratuita antianuncis per a l'Opera: Bloqueja anuncis molestos de vídeo al YouTube, anuncis del Facebook, bàners i molt més."
-  },
-  "description_safari": {
-    "message": "L'eina gratuita antianuncis per al Safari: Bloqueja anuncis molestos de vídeo al YouTube, anuncis del Facebook, bàners i molt més."
-  },
-  "disable_inline": {
-    "message": "Desactiva els anuncis de text en línia"
+    "description": "Note: this cannot be longer than 132 characters",
+    "message": "Used by over 50 million people, a free ad blocker for Chrome that blocks ALL annoying ads, malware and tracking."
   },
   "disabled_for_site": {
     "message": "S'ha <strong>deshabilitat</strong> per a aquest lloc"
@@ -72,7 +64,7 @@
     "message": "Afegeix altre subscripció de filtre"
   },
   "filters_addSubscription_label": {
-    "message": "Afegeix el filtre"
+    "message": "Afegeix una subscripció de filtre"
   },
   "filters_readMore_label": {
     "message": "Més informació"
@@ -102,13 +94,13 @@
     "message": "Mostra la llista"
   },
   "firstRun_acceptableAdsExplanation": {
-    "message": "Ens agradaria encoratjar els llocs web a utlitzar d'ara en endavant, publicitat no intrusiva. És per això que hem establert uns <a>patrons estrictes</a> per identificar els anuncis acceptables, els quals es mostren a sota de les preferències per defecte. Si encara voleu bloquejar tots els anuncis podeu <a>desactivar</a> això en pocs segons."
+    "message": "Ens agradaria encoratjar els llocs web a utlitzar d'ara en endavant publicitat no intrusiva. És per això que hem establert uns <a>patrons estrictes</a> per identificar els anuncis acceptables, els quals es mostren a sota de les preferències per defecte. Si encara voleu bloquejar tots els anuncis podeu <a>desactivar</a> això en pocs segons."
   },
   "firstRun_acceptableAdsHeadline": {
     "message": "Els anuncis molestos ara es bloquejaran"
   },
   "firstRun_contributor_credits": {
-    "message": "Crèdits de contribució"
+    "message": "Reconeiximents als co·laboradors"
   },
   "firstRun_dataCorruptionWarning": {
     "message": "Es segueix mostrant aquesta pàgina? <a>Cliqueu aquí!</a>"
@@ -144,7 +136,7 @@
     "message": "Sembla que un problema ha causat que tots els filtres es suprimeixin, però hem pogut restaurar una còpia de seguretat. Durant aquest procés, també s'ha restaurat els filtres i la configuració d'anuncis acceptable. Verifiqueu que la configuració actual és la desitjada, mitjançant les <a>«Preferències del filtre»</a> de l'Adblock Plus."
   },
   "firstRun_legacySafariWarning": {
-    "message": "Estàs usant una versió antiga de Safari que no es troba suportada per Adblock Plus."
+    "message": "Estàs emprant una versió antiga de Safari que no es troba suportada per Adblock Plus, el que pot fer que no funcioni correctament o amb un pobre rendiment. Es recomana actualitzar a Safari 6.1.1 o superior (amb OS X 10.8 Mountain Lion), o Safari 7.0.1 o superior (amb OS X 10.9 Mavericks), o emprar la darrera versió de Mozilla Firefox, Google Chrome o Opera."
   },
   "firstRun_share": {
     "message": "Digueu-ho a les vostres amistats"
@@ -168,22 +160,22 @@
     "message": "General"
   },
   "global_filter_elemhide_duplicate_id": {
-    "message": "Només un identificador de l'element pot ser especificat"
+    "message": "Només es pot indicar un identificador de l'element a ocultar"
   },
   "global_filter_elemhide_nocriteria": {
-    "message": "Cap criteri especificat per reconeixes l'element a amagar"
+    "message": "Cap criteri especificat per reconeixer l'element a amagar"
   },
   "global_notification_antiadblock_message": {
-    "message": "Aquesta web ha sigut coneguda per mostrar missatges dirigits a usuaris de Adblock Plus. Vols que Adblock Plus amague els missatges dirigits?"
+    "message": "Aquest lloc ha estat conegut per mostrar missatges dirigides als usuaris Adblock Plus. Voleu Adblock Plus per ocultar missatges apuntats?"
   },
   "global_notification_antiadblock_title": {
-    "message": "Amagar missatges dirigits?"
+    "message": "Amagar missatges apuntats?"
   },
   "global_remove_subscription_warning": {
     "message": "Realment desitges eliminar aquesta subscripció?"
   },
   "global_subscription_invalid_location": {
-    "message": "La llista de filtres no és una URL vàlida ni un nom de fitxer vàlid."
+    "message": "La ubicació de la llista de filtres no és una URL vàlida ni un nom de fitxer vàlid."
   },
   "last_updated_at": {
     "message": "Última actualització a les $time$ a $date$",
@@ -225,9 +217,6 @@
   "out_of_date_lists": {
     "message": "Les llistes obsoletes són actualitzades periòdicament."
   },
-  "overlay_hideplaceholders_label": {
-    "message": "Amaga les localitzacions dels elements blocats"
-  },
   "overlay_notification_button_close": {
     "message": "Tancar"
   },
@@ -235,7 +224,7 @@
     "message": "No"
   },
   "overlay_notification_button_yes": {
-    "message": "Si"
+    "message": "Sí"
   },
   "remove_button": {
     "message": "Suprimeix els seleccionats"

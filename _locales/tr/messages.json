@@ -27,16 +27,13 @@
     "message": "Bu pencere kapandığında, engelleyeceğiniz ögeye tıklayın (veya sağ tıklayın)."
   },
   "description_chrome": {
-    "message": "Chrome için ücretsiz reklam engelleyici: Facebook, YouTube, vb. sitelerdeki reklamları, banner'ları ve daha fazlasını engeller."
+    "message": "50 milyondan fazla kişinin kullandığı, Tüm reklamları ve zararlıları engelleyen Chrome için bedava bir reklam engelleyicisidir."
   },
   "description_opera": {
-    "message": "Opera için ücretsiz reklam engelleme aracı: Sinir bozan YouTube reklamlarını, Facebook reklamlarını, reklam bantlarını ve çok daha fazlasını engeller."
+    "message": "50 milyondan fazla kişinin kullandığı, Tüm reklamları ve zararlıları engelleyen, Opera için bedava bir reklam engelleyicisidir."
   },
   "description_safari": {
-    "message": "Safari için ücretsiz reklam engelleme aracı: Sinir bozan YouTube reklamlarını, Facebook reklamlarını, reklam bantlarını ve çok daha fazlasını engeller."
-  },
-  "disable_inline": {
-    "message": "Metin reklamlarını devre dışı bırak"
+    "message": "50 milyondan fazla kişinin kullandığı, Tüm reklamları ve zararlıları engelleyen Safari için bedava bir reklam engelleyicisidir."
   },
   "disabled_for_site": {
     "message": "Bu sitede <strong>devre dışı</strong>"
@@ -141,7 +138,7 @@
     "message": "Adblock Plus reklamları engellemekten daha fazlasını yapabilir"
   },
   "firstRun_filterlistsReinitializedWarning": {
-    "message": "Görünüşe göre bir sorun tüm filtrelerinizin kaldırılmasına neden olmuş ve bir yedeği geri yükleyemiyoruz. Bu yüzden filtrelerinizi ve Kabul Edilebilir Reklamlar ayarlarınızı sıfırlamamız gerekiyordu. Lütfen <a>Adblock Plus seçenekleri</a> bölümünde filtre listelerinizi ve Kabul Edilebilir Reklamlar ayarlarınızı denetleyin."
+    "message": "Görünüşe göre bir sorun tüm filtrelerinizin kaldırılmasına neden olmuş ve yedeği geri yükleyemiyoruz. Bu yüzden filtrelerinizi ve Kabul Edilebilir Reklamlar ayarlarınızı sıfırlamamız gerekiyordu. Lütfen <a>Adblock Plus seçenekleri</a> bölümünde filtre listelerinizi ve Kabul Edilebilir Reklamlar ayarlarınızı denetleyin."
   },
   "firstRun_legacySafariWarning": {
     "message": "Safari'nin Adblock Plus tarafından desteklenmeyen eski bir sürümünü kullanıyorsunuz. Uygulama doğru şekilde çalışmayabilir veya bazı internet sitelerinde kullanıcı deneyimini olumsuz etkileyebilir. Sürümünüzü Safari 6.1.1 veya daha yüksek  (OS X 10.8 Mountain Lion için), ya da Safari 7.0.1 veya daha yüksek (OS X 10.9 Mavericks için) bir sürüme yükseltmenizi, veya Mozilla Firefox, Google  Chrome ya da Opera'nın en son sürümünü kullanmanızı önemle tavsiye ederiz."
@@ -185,6 +182,14 @@
   "global_subscription_invalid_location": {
     "message": "Dosya listesi konumu ne düzgün bir URL ne de düzgün bir ada sahip."
   },
+  "invalid_css_selector": {
+    "message": "$selector$ geçerli bir CSS seçicisi değildir",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "Son Güncellenme: $date$ $time$",
     "placeholders": {
@@ -200,6 +205,14 @@
     "message": "En son bugün güncellendi. Güncelleme saati: $time$",
     "placeholders": {
       "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "line": {
+    "message": "Satır $number$",
+    "placeholders": {
+      "number": {
         "content": "$1"
       }
     }
@@ -224,9 +237,6 @@
   },
   "out_of_date_lists": {
     "message": "Zamanı geçmiş listeler düzenli olarak güncellenmektedir."
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "Engellenen öğelerin yer işaretlerini gizle"
   },
   "overlay_notification_button_close": {
     "message": "Kapat"
@@ -295,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Aboneliğin adı:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Filtre liste başlıklarına burada izin verilmiyor"
   },
   "update_now": {
     "message": "Şimdi güncelle"

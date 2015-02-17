@@ -27,16 +27,8 @@
     "message": "ఈ చిరుతలుపుని (పాపప్) మూసివేసిన తర్వాత, పేజీలో ఒక అంశాన్ని నొక్కండి (లేదా కుడి క్లిక్ చేయండి)."
   },
   "description_chrome": {
-    "message": "క్రోమ్ కోసం ఉచితంగా ప్రకటనలు నిరోధించే సాధనం (యాడ్ బ్లాక్)  : యూట్యూబ్, ఫేస్ బుక్ లలో  ప్రకటనలు, జెండాలు (బ్యానర్లు) మరెన్నో చిరాకు…"
-  },
-  "description_opera": {
-    "message": "ఓపెరా కోసం ఉచితంగా ప్రకటనలు నిరోధించే సాధనం (యాడ్ బ్లాక్)  : యూట్యూబ్, ఫేస్ బుక్ లలో  ప్రకటనలు, బ్యానర్లు మరెన్నో చిరాకు తెప్పించే ప్రకటనలని నిరోధిస్తుంది."
-  },
-  "description_safari": {
-    "message": "సఫారీ కోసం ఉచితంగా ప్రకటనలు నిరోధించే సాధనం (యాడ్ బ్లాక్)  : యూట్యూబ్, ఫేస్ బుక్ లలో  ప్రకటనలు, బ్యానర్లు మరెన్నో చిరాకు తెప్పించే ప్రకటనలని నిరోధిస్తుంది."
-  },
-  "disable_inline": {
-    "message": "అక్షరమాలలో (ఇన్ లైన్ యాడ్ లని)  ప్రకటనలని నిలిపివేయి "
+    "description": "Note: this cannot be longer than 132 characters",
+    "message": "Used by over 50 million people, a free ad blocker for Chrome that blocks ALL annoying ads, malware and tracking."
   },
   "disabled_for_site": {
     "message": "ఈ సైట్  లో <strong>ఆపివేయబడింది</strong>"
@@ -89,6 +81,15 @@
   },
   "name": {
     "message": "Adblock Plus"
+  },
+  "name_devbuild": {
+    "message": "అద్బ్లాచ్క్ ప్లస్ డెవలప్మెంట్ సాఫ్ట్వేర్ ఇది"
+  },
+  "notification_with_buttons": {
+    "message": "అన్ని లింక్స్ ఇదే నోటిఫికేషన్ లో తెరవాలి అనికుంటే, 'ఓకే' అని నొక్కండి."
+  },
+  "notification_without_buttons": {
+    "message": "నోటిఫికేషన్ నొక్కితే అన్ని లింక్స్ దాంట్లో తెరుసుకొంటాయి."
   },
   "options": {
     "message": "యాడ్ బ్లాక్ ప్లస్ ఐచ్ఛికాలు"

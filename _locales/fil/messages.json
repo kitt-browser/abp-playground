@@ -18,7 +18,7 @@
     "message": "Ilapat ang mga pagbabago"
   },
   "block_element": {
-    "message": "Isara ang element"
+    "message": "Ihinto ang element"
   },
   "cancel": {
     "message": "I-cancel"
@@ -27,16 +27,13 @@
     "message": "Pagkatapos isara itong pop-up, pindutin ang kaliwang mouse button (o kanang mouse button) ang element ng pahinang ito."
   },
   "description_chrome": {
-    "message": "Ang libreng adblock tool para sa Chrome browser: Inaalis ang mga video ads sa YouTube, Facebook, banners at marami pang iba."
+    "message": "Ginagamit ng halos 50 milyong tao, ito ay isang libreng ad blocker para sa Chrome na nag-aalis ng di kanais-nais na ads."
   },
   "description_opera": {
-    "message": "Ang libreng adblock tool para sa Opera browser: Inaalis ang mga video ads sa YouTube, Facebook, banners at marami pang iba."
+    "message": "Ginagamit ng halos 50 milyong tao, ito ay isang libreng ad blocker para sa Opera na nag-aalis ng di kanais-nais na ads."
   },
   "description_safari": {
-    "message": "Ang libreng adblock tool para sa Safari browser: Inaalis ang mga video ads sa YouTube, Facebook, banners at marami pang iba."
-  },
-  "disable_inline": {
-    "message": "Isawalang bisa ang inline text ads"
+    "message": "Ginagamit ng halos 50 milyong tao, ito ay isang libreng ad blocker para sa Safari na nag-aalis ng di kanais-nais na ads."
   },
   "disabled_for_site": {
     "message": "<strong>Hindi Maaari</strong> sa site na ito"
@@ -68,6 +65,14 @@
   "general": {
     "message": "General"
   },
+  "invalid_css_selector": {
+    "message": "$selector$ ay hindi valid na CSS selector",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "Huling na update noong $time$ sa $date$",
     "placeholders": {
@@ -83,6 +88,14 @@
     "message": "Huling na update kaninang $time$",
     "placeholders": {
       "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "line": {
+    "message": "Line $number$",
+    "placeholders": {
+      "number": {
         "content": "$1"
       }
     }
@@ -153,13 +166,16 @@
     "message": "Ibahagi itong mga numero"
   },
   "stats_show_iconnumber": {
-    "message": "Ipakita ang mga numero bilang icon"
+    "message": "Ipakita ang mga numero sa icon"
   },
   "stats_title": {
     "message": "Napigilan ang mga ads"
   },
   "subscriptionSelection_subscriptionSelector_label": {
     "message": "Mamili ng filter sa listahan:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Hindi maaari ang Filter list headers dito"
   },
   "update_now": {
     "message": "I-update ngayon"

@@ -27,16 +27,13 @@
     "message": "Nakon zatvaranja ovog skočnog prozora, kliknite (ili desni klik miša) na element na ovoj stranici."
   },
   "description_chrome": {
-    "message": "Besplatan alat koji blokira reklame za Chrome. Blokira naporne video reklame na YouTubu, Facebook reklame, transparente i još mnogo…"
+    "message": "Koristi ga više od 50 miliona ljudi, addblocker Chrome blokira iritirajuće oglase, zlonamjerne programe i praćenje."
   },
   "description_opera": {
-    "message": "Besplatan alat koji blokira reklame za Operu. Blokira naporne video reklame na YouTubu, Facebook reklame, transparente i još mnogo toga."
+    "message": "Koristi ga više od 50 miliona ljudi, addblocker Opera blokira iritirajuće oglase, zlonamjerne programe i praćenje."
   },
   "description_safari": {
-    "message": "Besplatan alat koji blokira reklame za Safari. Blokira naporne video reklame na YouTubu, Facebook reklame, transparente i još mnogo toga."
-  },
-  "disable_inline": {
-    "message": "Onemogući tekstualne reklame iste linije"
+    "message": "Koristi ga više od 50 miliona ljudi, addblocker Safari blokira iritirajuće oglase, zlonamjerne programe i praćenje."
   },
   "disabled_for_site": {
     "message": "<strong>Onemogućeno</strong> na ovoj stranici"
@@ -48,7 +45,7 @@
     "message": "Blokiraj element"
   },
   "edit_filters_raw": {
-    "message": "Uredi filtere kao raw tekst"
+    "message": "Uredi filtere kao običan tekst"
   },
   "enable_only_the": {
     "message": "Omogućite samo popis filtra koji vam je potreban. Previše popisa filtra može učiniti vaš preglednik neupotrebljivim."
@@ -60,7 +57,7 @@
     "message": "Popisi filtera"
   },
   "filter_must_follow_syntax": {
-    "message": "Vaši filtri moraju slijediti <a>Adblock Plus filter sintaksa</a>."
+    "message": "Vaš filter mora slijediti <a>Adblock Plus filter sintaksu</a>."
   },
   "filters_acceptableAds2_label": {
     "message": "Dopusti neke nenametljive reklame"
@@ -185,6 +182,14 @@
   "global_subscription_invalid_location": {
     "message": "Lokacija popisa filtera nije niti valjana web adresa niti naziv datoteke."
   },
+  "invalid_css_selector": {
+    "message": "$selector$ nije ispravan CSS selektor",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "Posljednji put je ažurirano $date$ u $time$",
     "placeholders": {
@@ -200,6 +205,14 @@
     "message": "Posljednj put je ažurirano danas u $time$",
     "placeholders": {
       "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "line": {
+    "message": "Linija $number$",
+    "placeholders": {
+      "number": {
         "content": "$1"
       }
     }
@@ -224,9 +237,6 @@
   },
   "out_of_date_lists": {
     "message": "Zastarjeli popisi redovito se ažuriraju."
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "Sakrij rezervirana mjesta blokiranih elemenata"
   },
   "overlay_notification_button_close": {
     "message": "Zatvori"
@@ -295,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Naslov pretplate:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Zaglavlja filter listi nisu dozvoljena ovdje"
   },
   "update_now": {
     "message": "Ažuriraj odmah"

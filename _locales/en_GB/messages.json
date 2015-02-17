@@ -18,7 +18,7 @@
     "message": "Apply changes"
   },
   "block_element": {
-    "message": "Block Element"
+    "message": "Block element"
   },
   "cancel": {
     "message": "Cancel"
@@ -27,16 +27,13 @@
     "message": "After closing this popup, click (or right-click) an element on the page."
   },
   "description_chrome": {
-    "message": "The free adblock tool for Chrome: Block annoying video ads on Youtube, Facebook ads, Banners and much others."
+    "message": "Used by over 50 million people, a free ad blocker for Chrome that blocks ALL annoying ads, malware and tracking."
   },
   "description_opera": {
-    "message": "The free adblock tool for Opera: Block annoying video ads on Youtube, Facebook ads, Banners and much others."
+    "message": "Used by over 50 million people, a free ad blocker for Opera that blocks ALL annoying ads, malware and tracking."
   },
   "description_safari": {
-    "message": "The free adblock tool for Safari: Block annoying video ads on Youtube, Facebook ads, Banners and much others."
-  },
-  "disable_inline": {
-    "message": "After closing this popup, click (or right-click) an element on the page."
+    "message": "Used by over 50 million people, a free ad blocker for Safari that blocks ALL annoying ads, malware and tracking."
   },
   "disabled_for_site": {
     "message": "<strong>Disabled</strong> on this site"
@@ -102,10 +99,10 @@
     "message": "View list"
   },
   "firstRun_acceptableAdsExplanation": {
-    "message": "We'd like to encourage websites to use straightforward, unobtrusive advertising. That's why we've established <a>strict guidelines</a> to identify positive ads, which are shown under default settings. If you still wish to block every ad you can <a>disable</a> this in a few seconds."
+    "message": "We'd like to encourage websites to use straightforward, unobtrusive advertising. That's why we've established <a>strict guidelines</a> to identify acceptable ads, which are shown under default settings. If you still wish to block every ad you can <a>disable</a> this in a few seconds."
   },
   "firstRun_acceptableAdsHeadline": {
-    "message": "Annoying ads will now be blocked."
+    "message": "Annoying ads will now be blocked"
   },
   "firstRun_contributor_credits": {
     "message": "Contributor Credits"
@@ -140,6 +137,9 @@
   "firstRun_features": {
     "message": "Adblock Plus can do more than block ads"
   },
+  "firstRun_filterlistsReinitializedWarning": {
+    "message": "It seems that an issue caused all filters to be removed and we were unable to restore a backup.\nTherefore we had to reset your own filters and Acceptable Ads settings. Please check your filter lists and acceptable Ads settings in the Adblock Plus settings."
+  },
   "firstRun_legacySafariWarning": {
     "message": "You are using an old version of Safari which is not supported by Adblock Plus. It might not work correctly or impair the user experience on some websites. We strongly recommend to either update to Safari 6.1.1 or higher (on OS X 10.8 Mountain Lion), or Safari 7.0.1 or higher (on OS X 10.9 Mavericks), or to use the latest version of Mozilla Firefox, Google Chrome or Opera."
   },
@@ -147,7 +147,7 @@
     "message": "Tell your friends"
   },
   "firstRun_share_headline": {
-    "message": "<a>Help us</a> in making the web a better place"
+    "message": "Help us in making the web a better place"
   },
   "firstRun_title": {
     "message": "Adblock Plus has been installed"
@@ -182,6 +182,14 @@
   "global_subscription_invalid_location": {
     "message": "Filter list location is neither a valid URL nor a valid file name."
   },
+  "invalid_css_selector": {
+    "message": "$selector$ is not a valid CSS selector",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "Last updated at $time$ on $date$",
     "placeholders": {
@@ -197,6 +205,14 @@
     "message": "Last updated at $time$ today",
     "placeholders": {
       "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "line": {
+    "message": "Line $number$",
+    "placeholders": {
+      "number": {
         "content": "$1"
       }
     }
@@ -221,9 +237,6 @@
   },
   "out_of_date_lists": {
     "message": "Out-of-date lists are updated periodically."
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "Hide placeholders of blocked elements"
   },
   "overlay_notification_button_close": {
     "message": "Close"
@@ -292,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Subscription title:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Filter list headers aren't allowed here"
   },
   "update_now": {
     "message": "Update now"
