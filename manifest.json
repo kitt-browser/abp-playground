@@ -35,7 +35,6 @@
         "ext/content.js", 
         "include.preload.js"
       ], 
-      "match_about_blank": true, 
       "matches": [
         "http://*/*", 
         "https://*/*"
@@ -47,7 +46,6 @@
       "js": [
         "include.postload.js"
       ], 
-      "match_about_blank": true, 
       "matches": [
         "http://*/*", 
         "https://*/*"
