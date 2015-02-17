@@ -1,6 +1,6 @@
 /*
- * This file is part of Adblock Plus <http://adblockplus.org/>,
- * Copyright (C) 2006-2014 Eyeo GmbH
+ * This file is part of Adblock Plus <https://adblockplus.org/>,
+ * Copyright (C) 2006-2015 Eyeo GmbH
  *
  * Adblock Plus is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -19,84 +19,273 @@
 var clickHide_activated = false;
 var clickHide_filters = null;
 var currentElement = null;
-var currentElement_boxShadow = null;
-var currentElement_backgroundColor;
-var clickHideFilters = null;
 var highlightedElementsSelector = null;
-var highlightedElementsBoxShadows = null;
-var highlightedElementsBGColors = null;
 var clickHideFiltersDialog = null;
 var lastRightClickEvent = null;
+var lastRightClickEventValid = false;
+
+function escapeChar(chr)
+{
+  var code = chr.charCodeAt(0);
+
+  // Control characters and leading digits must be escaped based on
+  // their char code in CSS. Moreover, curly brackets aren't allowed
+  // in elemhide filters, and therefore must be escaped based on their
+  // char code as well.
+  if (code <= 0x1F || code == 0x7F || /[\d\{\}]/.test(chr))
+    return "\\" + code.toString(16) + " ";
+
+  return "\\" + chr;
+}
+
+function quote(value)
+{
+  return '"' + value.replace(/["\\\{\}\x00-\x1F\x7F]/g, escapeChar) + '"';
+}
+
+function escapeCSS(s)
+{
+  return s.replace(/^[\d\-]|[^\w\-\u0080-\uFFFF]/g, escapeChar);
+}
+
+function highlightElement(element, shadowColor, backgroundColor)
+{
+  unhighlightElement(element);
+
+  var highlightWithOverlay = function()
+  {
+    var overlay = addElementOverlay(element);
+
+    // If the element isn't displayed no overlay will be added.
+    // Moreover, we don't need to highlight anything then.
+    if (!overlay)
+      return;
+
+    highlightElement(overlay, shadowColor, backgroundColor);
+    overlay.style.pointerEvents = "none";
+
+    element._unhighlight = function()
+    {
+      overlay.parentNode.removeChild(overlay);
+    };
+  };
+
+  var highlightWithStyleAttribute = function()
+  {
+    var originalBoxShadow = element.style.getPropertyValue("box-shadow");
+    var originalBoxShadowPriority = element.style.getPropertyPriority("box-shadow");
+    var originalBackgroundColor = element.style.getPropertyValue("background-color");
+    var originalBackgroundColorPriority = element.style.getPropertyPriority("background-color");
+
+    element.style.setProperty("box-shadow", "inset 0px 0px 5px " + shadowColor, "important");
+    element.style.setProperty("background-color", backgroundColor, "important");
+
+    element._unhighlight = function()
+    {
+      this.style.removeProperty("box-shadow");
+      this.style.setProperty(
+        "box-shadow",
+        originalBoxShadow,
+        originalBoxShadowPriority
+      );
+
+      this.style.removeProperty("background-color");
+      this.style.setProperty(
+        "background-color",
+        originalBackgroundColor,
+        originalBackgroundColorPriority
+      );
+    };
+  };
+
+  if ("prisoner" in element)
+    highlightWithStyleAttribute();
+  else
+    highlightWithOverlay();
+}
+
+
+function unhighlightElement(element)
+{
+  if ("_unhighlight" in element)
+  {
+    element._unhighlight();
+    delete element._unhighlight;
+  }
+}
 
 // Highlight elements according to selector string. This would include
 // all elements that would be affected by proposed filters.
 function highlightElements(selectorString) {
-  if(highlightedElementsSelector)
-    unhighlightElements();
+  unhighlightElements();
 
   var highlightedElements = document.querySelectorAll(selectorString);
   highlightedElementsSelector = selectorString;
-  highlightedElementsBoxShadows = new Array();
-  highlightedElementsBGColors = new Array();
 
-  for(var i = 0; i < highlightedElements.length; i++) {
-    highlightedElementsBoxShadows[i] = highlightedElements[i].style.getPropertyValue("-webkit-box-shadow");
-    highlightedElementsBGColors[i] = highlightedElements[i].style.backgroundColor;
-    highlightedElements[i].style.setProperty("-webkit-box-shadow", "inset 0px 0px 5px #fd6738");
-    highlightedElements[i].style.backgroundColor = "#f6e1e5";
-  }
+  for(var i = 0; i < highlightedElements.length; i++)
+    highlightElement(highlightedElements[i], "#fd6738", "#f6e1e5");
 }
 
 // Unhighlight all elements, including those that would be affected by
 // the proposed filters
 function unhighlightElements() {
-  if(highlightedElementsSelector == null)
-    return;
-  var highlightedElements = document.querySelectorAll(highlightedElementsSelector);
-  for(var i = 0; i < highlightedElements.length; i++) {
-    highlightedElements[i].style.setProperty("-webkit-box-shadow", highlightedElementsBoxShadows[i]);
-    highlightedElements[i].style.backgroundColor = highlightedElementsBGColors[i];
+  if (highlightedElementsSelector)
+  {
+    Array.prototype.forEach.call(
+      document.querySelectorAll(highlightedElementsSelector),
+      unhighlightElement
+    );
+
+    highlightedElementsSelector = null;
   }
-  highlightedElementsSelector = null;
 }
 
-// Gets the absolute position of an element by walking up the DOM tree,
-// adding up offsets.
-// I hope there's a better way because it just seems absolutely stupid
-// that the DOM wouldn't have a direct way to get this, given that it
-// has hundreds and hundreds of other methods that do random junk.
-function getAbsolutePosition(elt) {
-  var l = 0;
-  var t = 0;
-  for(; elt; elt = elt.offsetParent) {
-    l += elt.offsetLeft;
-    t += elt.offsetTop;
+function getURLsFromObjectElement(element)
+{
+  var url = element.getAttribute("data");
+  if (url)
+    return [resolveURL(url)];
+
+  for (var i = 0; i < element.children.length; i++)
+  {
+    var child = element.children[i];
+    if (child.localName != "param")
+      continue;
+
+    var name = child.getAttribute("name");
+    if (name != "movie"  && // Adobe Flash
+        name != "source" && // Silverlight
+        name != "src"    && // Real Media + Quicktime
+        name != "FileName") // Windows Media
+      continue;
+
+    var value = child.getAttribute("value");
+    if (!value)
+      continue;
+
+    return [resolveURL(value)];
   }
-  return [l, t];
+
+  return [];
+}
+
+function getURLsFromAttributes(element)
+{
+  var urls = [];
+
+  if (element.src)
+    urls.push(element.src);
+
+  if (element.srcset)
+  {
+    var candidates = element.srcset.split(",");
+    for (var i = 0; i < candidates.length; i++)
+    {
+      var url = candidates[i].trim().replace(/\s+\S+$/, "");
+      if (url)
+        urls.push(resolveURL(url));
+    }
+  }
+
+  return urls;
+}
+
+function getURLsFromMediaElement(element)
+{
+  var urls = getURLsFromAttributes(element);
+
+  for (var i = 0; i < element.children.length; i++)
+  {
+    var child = element.children[i];
+    if (child.localName == "source" || child.localName == "track")
+      urls.push.apply(urls, getURLsFromAttributes(child));
+  }
+
+  if (element.poster)
+    urls.push(element.poster);
+
+  return urls;
+}
+
+function getURLsFromElement(element) {
+  switch (element.localName)
+  {
+    case "object":
+      return getURLsFromObjectElement(element);
+
+    case "video":
+    case "audio":
+    case "picture":
+      return getURLsFromMediaElement(element);
+  }
+
+  return getURLsFromAttributes(element);
+}
+
+function isBlockable(element)
+{
+  if (element.id)
+    return true;
+  if (element.classList.length > 0)
+    return true;
+  if (getURLsFromElement(element).length > 0)
+    return true;
+
+  // We only generate filters based on the "style" attribute,
+  // if this is the only way we can generate a filter, and
+  // only if there are at least two CSS properties defined.
+  if (/:.+:/.test(element.getAttribute("style")))
+    return true;
+
+  return false;
 }
 
 // Adds an overlay to an element, which is probably a Flash object
 function addElementOverlay(elt) {
-  // If this element is enclosed in an object tag, we prefer to block that instead
-  if(!elt)
-    return null;
+  var zIndex = "auto";
+  var position = "absolute";
 
-  // If element doesn't have at least one of class name, ID or URL, give up
-  // because we don't know how to construct a filter rule for it
-  var url = getElementURL(elt);
-  if(!elt.className && !elt.id && !url)
-    return;
-  var thisStyle = getComputedStyle(elt, null);
+  for (var e = elt; e; e = e.parentElement)
+  {
+    var style = getComputedStyle(e);
+
+    // If the element isn't rendered (since its or one of its ancestor's
+    // "display" property is "none"), the overlay wouldn't match the element.
+    if (style.display == "none")
+      return null;
+
+    // If the element or one of its ancestors uses fixed postioning, the overlay
+    // has to use fixed postioning too. Otherwise it might not match the element.
+    if (style.position == "fixed")
+      position = "fixed";
+
+    // Determine the effective z-index, which is the highest z-index used
+    // by the element and its offset ancestors, and increase it by one.
+    // When using a lower z-index the element would cover the overlay.
+    // When using a higher z-index the overlay might also cover other elements.
+    if (style.position != "static" && style.zIndex != "auto")
+    {
+      var curZIndex = parseInt(style.zIndex, 10) + 1;
+
+      if (zIndex == "auto" || curZIndex > zIndex)
+        zIndex = curZIndex;
+    }
+  }
+
   var overlay = document.createElement('div');
   overlay.prisoner = elt;
-  overlay.prisonerURL = url;
   overlay.className = "__adblockplus__overlay";
-  overlay.setAttribute('style', 'opacity:0.4; background-color:#ffffff; display:inline-box; ' + 'width:' + thisStyle.width + '; height:' + thisStyle.height + '; position:absolute; overflow:hidden; -webkit-box-sizing:border-box; z-index: 99999');
-  var pos = getAbsolutePosition(elt);
-  overlay.style.left = pos[0] + "px";
-  overlay.style.top = pos[1] + "px";
+  overlay.setAttribute('style', 'opacity:0.4; display:inline-box; overflow:hidden; box-sizing:border-box;');
+  var rect = elt.getBoundingClientRect();
+  overlay.style.width = rect.width + "px";
+  overlay.style.height = rect.height + "px";
+  overlay.style.left = (rect.left + window.scrollX) + "px";
+  overlay.style.top = (rect.top + window.scrollY) + "px";
+  overlay.style.position = position;
+  overlay.style.zIndex = zIndex;
+
   // elt.parentNode.appendChild(overlay, elt);
-  document.body.appendChild(overlay);
+  document.documentElement.appendChild(overlay);
   return overlay;
 }
 
@@ -106,11 +295,7 @@ function clickHide_showDialog(left, top, filters)
 {
   // If we are already selecting, abort now
   if (clickHide_activated || clickHideFiltersDialog)
-  {
-    var savedElement = (currentElement.prisoner ? currentElement.prisoner : currentElement);
-    clickHide_deactivate();
-    currentElement = savedElement;
-  }
+    clickHide_deactivate(true);
 
   clickHide_filters = filters;
 
@@ -118,7 +303,7 @@ function clickHide_showDialog(left, top, filters)
   clickHideFiltersDialog.src = ext.getURL("block.html");
   clickHideFiltersDialog.setAttribute("style", "position: fixed !important; visibility: hidden; display: block !important; border: 0px !important;");
   clickHideFiltersDialog.style.WebkitBoxShadow = "5px 5px 20px rgba(0,0,0,0.5)";
-  clickHideFiltersDialog.style.zIndex = 99999;
+  clickHideFiltersDialog.style.zIndex = 0x7FFFFFFF;
 
   // Position in upper-left all the time
   clickHideFiltersDialog.style.left = "50px";
@@ -130,14 +315,14 @@ function clickHide_showDialog(left, top, filters)
   {
     if (clickHideFiltersDialog)
       clickHideFiltersDialog.style.setProperty("opacity", "0.7");
-  }
+  };
   clickHideFiltersDialog.onmouseover = function()
   {
     if (clickHideFiltersDialog)
       clickHideFiltersDialog.style.setProperty("opacity", "1.0");
-  }
+  };
 
-  document.body.appendChild(clickHideFiltersDialog);
+  document.documentElement.appendChild(clickHideFiltersDialog);
 }
 
 // Turn on the choose element to create filter thing
@@ -149,67 +334,130 @@ function clickHide_activate() {
   if (clickHide_activated || clickHideFiltersDialog)
     clickHide_deactivate();
 
-  // Add overlays for elements with URLs so user can easily click them
-  var elts = document.querySelectorAll('object,embed,img,iframe');
+  // Add overlays for blockable elements that don't emit mouse events,
+  // so that they can still be selected.
+  var elts = document.querySelectorAll('object,embed,iframe,frame');
   for(var i=0; i<elts.length; i++)
-    addElementOverlay(elts[i]);
+  {
+    var element = elts[i];
+    if (isBlockable(element))
+      addElementOverlay(element);
+  }
 
   clickHide_activated = true;
-  document.addEventListener("mouseover", clickHide_mouseOver, false);
-  document.addEventListener("mouseout", clickHide_mouseOut, false);
-  document.addEventListener("click", clickHide_mouseClick, false);
-  document.addEventListener("keydown", clickHide_keyDown, false);
+  document.addEventListener("mousedown", clickHide_stopPropagation, true);
+  document.addEventListener("mouseup", clickHide_stopPropagation, true);
+  document.addEventListener("mouseenter", clickHide_stopPropagation, true);
+  document.addEventListener("mouseleave", clickHide_stopPropagation, true);
+  document.addEventListener("mouseover", clickHide_mouseOver, true);
+  document.addEventListener("mouseout", clickHide_mouseOut, true);
+  document.addEventListener("click", clickHide_mouseClick, true);
+  document.addEventListener("keydown", clickHide_keyDown, true);
+
+  ext.onExtensionUnloaded.addListener(clickHide_deactivate);
 }
 
 // Called when user has clicked on something and we are waiting for confirmation
 // on whether the user actually wants these filters
 function clickHide_rulesPending() {
   clickHide_activated = false;
-  document.removeEventListener("mouseover", clickHide_mouseOver, false);
-  document.removeEventListener("mouseout", clickHide_mouseOut, false);
-  document.removeEventListener("click", clickHide_mouseClick, false);
-  document.removeEventListener("keydown", clickHide_keyDown, false);
+  document.removeEventListener("mousedown", clickHide_stopPropagation, true);
+  document.removeEventListener("mouseup", clickHide_stopPropagation, true);
+  document.removeEventListener("mouseenter", clickHide_stopPropagation, true);
+  document.removeEventListener("mouseleave", clickHide_stopPropagation, true);
+  document.removeEventListener("mouseover", clickHide_mouseOver, true);
+  document.removeEventListener("mouseout", clickHide_mouseOut, true);
+  document.removeEventListener("click", clickHide_mouseClick, true);
+  document.removeEventListener("keydown", clickHide_keyDown, true);
 }
 
 // Turn off click-to-hide
-function clickHide_deactivate()
+function clickHide_deactivate(keepOverlays)
 {
   if (clickHideFiltersDialog)
   {
-    document.body.removeChild(clickHideFiltersDialog);
+    document.documentElement.removeChild(clickHideFiltersDialog);
     clickHideFiltersDialog = null;
   }
-
-  if(currentElement) {
-    currentElement.removeEventListener("contextmenu", clickHide_elementClickHandler, false);
-    unhighlightElements();
-    currentElement.style.setProperty("-webkit-box-shadow", currentElement_boxShadow);
-    currentElement.style.backgroundColor = currentElement_backgroundColor;
-    currentElement = null;
-    clickHideFilters = null;
-  }
-  unhighlightElements();
 
   clickHide_activated = false;
   clickHide_filters = null;
   if(!document)
     return; // This can happen inside a nuked iframe...I think
-  document.removeEventListener("mouseover", clickHide_mouseOver, false);
-  document.removeEventListener("mouseout", clickHide_mouseOut, false);
-  document.removeEventListener("click", clickHide_mouseClick, false);
-  document.removeEventListener("keydown", clickHide_keyDown, false);
 
-  // Remove overlays
-  // For some reason iterating over the array returend by getElementsByClassName() doesn't work
-  var elt;
-  while(elt = document.querySelector('.__adblockplus__overlay'))
-    elt.parentNode.removeChild(elt);
+  document.removeEventListener("mousedown", clickHide_stopPropagation, true);
+  document.removeEventListener("mouseup", clickHide_stopPropagation, true);
+  document.removeEventListener("mouseenter", clickHide_stopPropagation, true);
+  document.removeEventListener("mouseleave", clickHide_stopPropagation, true);
+  document.removeEventListener("mouseover", clickHide_mouseOver, true);
+  document.removeEventListener("mouseout", clickHide_mouseOut, true);
+  document.removeEventListener("click", clickHide_mouseClick, true);
+  document.removeEventListener("keydown", clickHide_keyDown, true);
+
+  if (keepOverlays !== true)
+  {
+    lastRightClickEvent = null;
+
+    if (currentElement) {
+      currentElement.removeEventListener("contextmenu",  clickHide_elementClickHandler, true);
+      unhighlightElements();
+      unhighlightElement(currentElement);
+      currentElement = null;
+    }
+    unhighlightElements();
+
+    var overlays = document.getElementsByClassName("__adblockplus__overlay");
+    while (overlays.length > 0)
+      overlays[0].parentNode.removeChild(overlays[0]);
+
+    ext.onExtensionUnloaded.removeListener(clickHide_deactivate);
+  }
 }
 
-function clickHide_elementClickHandler(ev) {
-  ev.preventDefault();
-  ev.stopPropagation();
-  clickHide_mouseClick(ev);
+function clickHide_stopPropagation(e)
+{
+  e.stopPropagation();
+}
+
+function clickHide_elementClickHandler(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  clickHide_mouseClick(e);
+}
+
+function getBlockableElementOrAncestor(element)
+{
+  while (element && element != document.documentElement
+                 && element != document.body)
+  {
+    if (element instanceof HTMLElement && element.localName != "area")
+    {
+      // Handle <area> and their <map> elements specially,
+      // blocking the image they are associated with
+      if (element.localName == "map")
+      {
+        var images = document.querySelectorAll("img[usemap]");
+        for (var i = 0; i < images.length; i++)
+        {
+          var image = images[i];
+          var usemap = image.getAttribute("usemap");
+          var index = usemap.indexOf("#");
+
+          if (index != -1 && usemap.substr(index + 1) == element.name)
+            return getBlockableElementOrAncestor(image);
+        }
+
+        return null;
+      }
+
+      if (isBlockable(element))
+        return element;
+    }
+
+    element = element.parentElement;
+  }
+
+  return null;
 }
 
 // Hovering over an element so highlight it
@@ -218,22 +466,16 @@ function clickHide_mouseOver(e)
   if (clickHide_activated == false)
     return;
 
-  var target = e.target;
-  while (target.parentNode && !(target.id || target.className || target.src))
-    target = target.parentNode;
-  if (target == document.documentElement || target == document.body)
-    target = null;
+  var target = getBlockableElementOrAncestor(e.target);
 
-  if (target && target instanceof HTMLElement)
+  if (target)
   {
     currentElement = target;
-    currentElement_boxShadow = target.style.getPropertyValue("-webkit-box-shadow");
-    currentElement_backgroundColor = target.style.backgroundColor;
-    target.style.setProperty("-webkit-box-shadow", "inset 0px 0px 5px #d6d84b");
-    target.style.backgroundColor = "#f8fa47";
 
-    target.addEventListener("contextmenu", clickHide_elementClickHandler, false);
+    highlightElement(target, "#d6d84b", "#f8fa47");
+    target.addEventListener("contextmenu", clickHide_elementClickHandler, true);
   }
+  e.stopPropagation();
 }
 
 // No longer hovering over this element so unhighlight it
@@ -242,10 +484,9 @@ function clickHide_mouseOut(e)
   if (!clickHide_activated || !currentElement)
     return;
 
-  currentElement.style.setProperty("-webkit-box-shadow", currentElement_boxShadow);
-  currentElement.style.backgroundColor = currentElement_backgroundColor;
-
-  currentElement.removeEventListener("contextmenu", clickHide_elementClickHandler, false);
+  unhighlightElement(currentElement);
+  currentElement.removeEventListener("contextmenu", clickHide_elementClickHandler, true);
+  e.stopPropagation();
 }
 
 // Selects the currently hovered-over filter or cancels selection
@@ -255,7 +496,14 @@ function clickHide_keyDown(e)
      clickHide_mouseClick(e);
   else if (!e.ctrlKey && !e.altKey && !e.shiftKey && e.keyCode == 27 /*DOM_VK_ESCAPE*/)
   {
-    clickHide_deactivate();
+    ext.backgroundPage.sendMessage(
+    {
+      type: "forward",
+      payload:
+      {
+        type: "clickhide-deactivate"
+      }
+    });
     e.preventDefault();
     e.stopPropagation();
   }
@@ -270,89 +518,86 @@ function clickHide_mouseClick(e)
     return;
 
   var elt = currentElement;
-  var url = null;
-  if (currentElement.className && currentElement.className == "__adblockplus__overlay")
-  {
+  if (currentElement.classList.contains("__adblockplus__overlay"))
     elt = currentElement.prisoner;
-    url = currentElement.prisonerURL;
-  }
-  else if (elt.src)
-    url = elt.src;
 
-  // Only normalize when the element contains a URL (issue 328.)
-  // The URL is not always normalized, so do it here
-  if (url)
-    url = normalizeURL(relativeToAbsoluteUrl(url));
+  var clickHideFilters = [];
+  var selectorList = [];
 
-  // Construct filters. The popup will retrieve these.
-  // Only one ID
-  var elementId = elt.id ? elt.id.split(' ').join('') : null;
-  // Can have multiple classes, and there might be extraneous whitespace
-  var elementClasses = null;
-  if (elt.className)
-    elementClasses = elt.className.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '').split(' ');
-
-  clickHideFilters = new Array();
-  selectorList = new Array();
-  if (elementId)
+  var addSelector = function(selector)
   {
-    clickHideFilters.push(document.domain + "###" + elementId);
-    selectorList.push("#" + elementId);
-  }
-  if (elementClasses && elementClasses.length > 0)
-  {
-    var selector = elementClasses.map(function(elClass)
-    {
-      return "." + elClass.replace(/([^\w-])/, "\\$1");
-    }).join("");
+    if (selectorList.indexOf(selector) != -1)
+      return;
 
     clickHideFilters.push(document.domain + "##" + selector);
     selectorList.push(selector);
-  }
-  if (url)
+  };
+
+  if (elt.id)
+    addSelector("#" + escapeCSS(elt.id));
+
+  if (elt.classList.length > 0)
   {
-    clickHideFilters.push(relativeToAbsoluteUrl(url));
-    selectorList.push(elt.localName + '[src="' + url + '"]');
+    var selector = "";
+
+    for (var i = 0; i < elt.classList.length; i++)
+      selector += "." + escapeCSS(elt.classList[i]);
+
+    addSelector(selector);
   }
 
-  // Show popup
-  clickHide_showDialog(e.clientX, e.clientY, clickHideFilters);
+  var urls = getURLsFromElement(elt);
+  for (var i = 0; i < urls.length; i++)
+  {
+    var url = urls[i];
 
-  // Highlight the unlucky elements
-  // Restore currentElement's box-shadow and bgcolor so that highlightElements won't save those
-  currentElement.style.setProperty("-webkit-box-shadow", currentElement_boxShadow);
-  currentElement.style.backgroundColor = currentElement_backgroundColor;
+    if (/^https?:/i.test(url))
+    {
+      var filter = url.replace(/^[\w\-]+:\/+(?:www\.)?/, "||");
+
+      if (clickHideFilters.indexOf(filter) == -1)
+        clickHideFilters.push(filter);
+
+      continue;
+    }
+
+    if (url == elt.src)
+      addSelector(escapeCSS(elt.localName) + '[src=' + quote(elt.getAttribute("src")) + ']');
+  }
+
+  // as last resort, create a filter based on inline styles
+  if (clickHideFilters.length == 0)
+  {
+    var style = elt.getAttribute("style");
+    if (style)
+      addSelector(escapeCSS(elt.localName) + '[style=' + quote(style) + ']');
+  }
+
+  // Show popup, or if inside frame tell the parent to do it
+  if (window.self == window.top)
+    clickHide_showDialog(e.clientX, e.clientY, clickHideFilters);
+  else
+    ext.backgroundPage.sendMessage(
+    {
+      type: "forward",
+      payload:
+      {
+        type: "clickhide-show-dialog",
+        screenX: e.screenX,
+        screenY: e.screenY,
+        clickHideFilters: clickHideFilters
+      }
+    });
+
   // Highlight the elements specified by selector in yellow
-  highlightElements(selectorList.join(","));
+  if (selectorList.length > 0)
+    highlightElements(selectorList.join(","));
   // Now, actually highlight the element the user clicked on in red
-  currentElement.style.setProperty("-webkit-box-shadow", "inset 0px 0px 5px #fd1708");
-  currentElement.style.backgroundColor = "#f6a1b5";
+  highlightElement(currentElement, "#fd1708", "#f6a1b5");
 
   // Make sure the browser doesn't handle this click
   e.preventDefault();
   e.stopPropagation();
-}
-
-// Extracts source URL from an IMG, OBJECT, EMBED, or IFRAME
-function getElementURL(elt) {
-  // Check children of object nodes for "param" nodes with name="movie" that specify a URL
-  // in value attribute
-  var url;
-  if(elt.localName.toUpperCase() == "OBJECT" && !(url = elt.getAttribute("data"))) {
-    // No data attribute, look in PARAM child tags for a URL for the swf file
-    var params = elt.querySelectorAll("param[name=\"movie\"]");
-    // This OBJECT could contain an EMBED we already nuked, in which case there's no URL
-    if(params[0])
-      url = params[0].getAttribute("value");
-    else {
-      params = elt.querySelectorAll("param[name=\"src\"]");
-      if(params[0])
-        url = params[0].getAttribute("value");
-    }
-  } else if(!url) {
-    url = elt.getAttribute("src") || elt.getAttribute("href");
-  }
-  return url;
 }
 
 // This function Copyright (c) 2008 Jeni Tennison, from jquery.uri.js
@@ -384,33 +629,31 @@ function removeDotSegments(u) {
   }
 }
 
-// Does some degree of URL normalization
-function normalizeURL(url)
-{
-  var components = url.match(/(.+:\/\/.+?)\/(.*)/);
-  if(!components)
-    return url;
-  var newPath = removeDotSegments(components[2]);
-  if(newPath.length == 0)
-    return components[1];
-  if(newPath[0] != '/')
-    newPath = '/' + newPath;
-  return components[1] + newPath;
-}
-
-// Content scripts are apparently invoked on non-HTML documents, so we have to
-// check for that before doing stuff. |document instanceof HTMLDocument| check
-// will fail on some sites like planet.mozilla.org because WebKit creates
-// Document instances for XHTML documents, have to test the root element.
-if (document.documentElement instanceof HTMLElement)
+// In Chrome 37-40, the document_end content script (this one) runs properly, while the
+// document_start content scripts (that defines ext) might not. Check whether variable ext
+// exists before continuing to avoid "Uncaught ReferenceError: ext is not defined".
+// See https://crbug.com/416907
+if ("ext" in window && document instanceof HTMLDocument)
 {
   // Use a contextmenu handler to save the last element the user right-clicked on.
   // To make things easier, we actually save the DOM event.
   // We have to do this because the contextMenu API only provides a URL, not the actual
   // DOM element.
-  document.addEventListener('contextmenu', function(e) {
+  document.addEventListener('contextmenu', function(e)
+  {
     lastRightClickEvent = e;
-  }, false);
+    // We also need to ensure any old lastRightClickEvent variables in other
+    // frames are cleared.
+    lastRightClickEventValid = true;
+    ext.backgroundPage.sendMessage(
+    {
+      type: "forward",
+      payload:
+      {
+        type: "clickhide-clear-last-right-click-event"
+      }
+    });
+  }, true);
 
   document.addEventListener("click", function(event)
   {
@@ -461,8 +704,8 @@ if (document.documentElement instanceof HTMLElement)
       title = url;
 
     // Trim spaces in title and URL
-    title = title.replace(/^\s+/, "").replace(/\s+$/, "");
-    url = url.replace(/^\s+/, "").replace(/\s+$/, "");
+    title = title.trim();
+    url = url.trim();
     if (!/^(https?|ftp):/.test(url))
       return;
 
@@ -487,51 +730,12 @@ if (document.documentElement instanceof HTMLElement)
         clickHide_deactivate();
         break;
       case "clickhide-new-filter":
-        // The request is received by all frames, so ignore it if we're not the frame the
-        // user right-clicked in
-        if(!lastRightClickEvent)
-          return;
-        // We hope the URL we are given is the same as the one in the element referenced
-        // by lastRightClickEvent.target. If not, we just discard
-        var target = lastRightClickEvent.target;
-        var url = target.src;
-        // If we don't have the element with a src URL same as the filter, look for it.
-        // Chrome's context menu API is terrible. Why can't it give us the friggin' element
-        // to start with?
-        if(msg.filter !== url)
+        if(lastRightClickEvent)
         {
-          // Grab all elements with a src attribute.
-          // This won't work for all object/embed tags, but the context menu API doesn't
-          // work on those, so we're OK for now.
-          var elts = document.querySelectorAll('[src]');
-          for(var i=0; i<elts.length; i++) {
-            url = elts[i].src;
-            if(msg.filter === url)
-            {
-              // This is hopefully our element. In case of multiple elements
-              // with the same src, only one will be highlighted.
-              target = elts[i];
-              break;
-            }
-          }
-        }
-        // Following test will be true if we found the element with the filter URL
-        if(msg.filter === url)
-        {
-          // This request would have come from the chrome.contextMenu handler, so we
-          // simulate the user having chosen the element to get rid of via the usual means.
           clickHide_activated = true;
-          // FIXME: clickHideFilters is erased in clickHide_mouseClick anyway, so why set it?
-          clickHideFilters = [msg.filter];
-          // Coerce red highlighted overlay on top of element to remove.
-          // TODO: Wow, the design of the clickHide stuff is really dumb - gotta fix it sometime
-          currentElement = addElementOverlay(target);
-          currentElement_backgroundColor = target.style.backgroundColor;
-          // clickHide_mouseOver(lastRightClickEvent);
+          currentElement = getBlockableElementOrAncestor(lastRightClickEvent.target);
           clickHide_mouseClick(lastRightClickEvent);
         }
-        else
-          console.log("clickhide-new-filter: URLs don't match. Couldn't find that element.", request.filter, url, lastRightClickEvent.target.src);
         break;
       case "clickhide-init":
         if (clickHideFiltersDialog)
@@ -546,23 +750,35 @@ if (document.documentElement instanceof HTMLElement)
       case "clickhide-move":
         if (clickHideFiltersDialog)
         {
-          clickHideFiltersDialog.style.left = (parseInt(clickHideFiltersDialog.style.left, 10) + request.x) + "px";
-          clickHideFiltersDialog.style.top = (parseInt(clickHideFiltersDialog.style.top, 10) + request.y) + "px";
+          clickHideFiltersDialog.style.left = (parseInt(clickHideFiltersDialog.style.left, 10) + msg.x) + "px";
+          clickHideFiltersDialog.style.top = (parseInt(clickHideFiltersDialog.style.top, 10) + msg.y) + "px";
         }
         break;
       case "clickhide-close":
-        if (clickHideFiltersDialog)
+        if (currentElement && msg.remove)
         {
           // Explicitly get rid of currentElement
-          if (msg.remove && currentElement && currentElement.parentNode)
-            currentElement.parentNode.removeChild(currentElement);
-
-          clickHide_deactivate();
+          var element = currentElement.prisoner || currentElement;
+          if (element && element.parentNode)
+            element.parentNode.removeChild(element);
         }
+        clickHide_deactivate();
         break;
-      default:
-        sendResponse({});
+      case "clickhide-show-dialog":
+        if (window.self == window.top)
+          clickHide_showDialog(msg.screenX + window.pageXOffset,
+                               msg.screenY + window.pageYOffset,
+                               msg.clickHideFilters);
+        break;
+      case "clickhide-clear-last-right-click-event":
+        if (lastRightClickEventValid)
+          lastRightClickEventValid = false;
+        else
+          lastRightClickEvent = null;
         break;
     }
   });
+
+  if (window == window.top)
+    ext.backgroundPage.sendMessage({type: "report-html-page"});
 }

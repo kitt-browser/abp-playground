@@ -1,6 +1,6 @@
 /*
- * This file is part of Adblock Plus <http://adblockplus.org/>,
- * Copyright (C) 2006-2014 Eyeo GmbH
+ * This file is part of Adblock Plus <https://adblockplus.org/>,
+ * Copyright (C) 2006-2015 Eyeo GmbH
  *
  * Adblock Plus is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -296,19 +296,21 @@ section > p
   display: inline-block;
   vertical-align: top;
   padding: 5px 0 5px 0;
+  border: 1px dashed #37506d;
+  border-style: none dashed;
 }
 
 #donate-block
 {
-  border: 1px dashed #37506d;
-  border-style: none dashed;
   width: 50%;
 }
 
 #share-block
 {
-  border-right: 1px dashed #37506d;
   width: 49%;
+
+  -webkit-border-start-style: none;
+  -moz-border-start-style: none;
 }
 
 .share-buttons
