@@ -1,6 +1,6 @@
 /*
- * This file is part of Adblock Plus <http://adblockplus.org/>,
- * Copyright (C) 2006-2014 Eyeo GmbH
+ * This file is part of Adblock Plus <https://adblockplus.org/>,
+ * Copyright (C) 2006-2015 Eyeo GmbH
  *
  * Adblock Plus is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -17,65 +17,6 @@
 
 var SELECTOR_GROUP_SIZE = 20;
 
-// use Shadow DOM if available to don't mess with web pages that
-// rely on the order of their own <style> tags. However
-// the <shadow> element is broken in some Chrome 32 builds (#309)
-//
-// also Chrome 31-33 crashes in some situations on some pages when using
-// ShadowDOM, e.g. when pressing tab key on Wikipedia and Facebook (#498)
-//
-// also we must not create the shadow root in the response callback passed
-// to sendMessage(), otherwise Chrome breaks some websites (#450)
-var shadow = null;
-if ("webkitCreateShadowRoot" in document.documentElement && !/\bChrome\/3[1-3]\b/.test(navigator.userAgent))
-{
-  shadow = document.documentElement.webkitCreateShadowRoot();
-  shadow.appendChild(document.createElement("shadow"));
-}
-
-// Sets the currently used CSS rules for elemhide filters
-function setElemhideCSSRules(selectors)
-{
-  if (selectors.length == 0)
-    return;
-
-  var style = document.createElement("style");
-  style.setAttribute("type", "text/css");
-
-  if (shadow)
-  {
-    shadow.appendChild(style);
-
-    try
-    {
-      document.querySelector("::content");
-
-      for (var i = 0; i < selectors.length; i++)
-        selectors[i] = "::content " + selectors[i];
-    }
-    catch (e)
-    {
-      for (var i = 0; i < selectors.length; i++)
-        selectors[i] = "::-webkit-distributed(" + selectors[i] + ")";
-    }
-  }
-  else
-  {
-    // Try to insert the style into the <head> tag, inserting directly under the
-    // document root breaks dev tools functionality:
-    // http://code.google.com/p/chromium/issues/detail?id=178109
-    (document.head || document.documentElement).appendChild(style);
-  }
-
-  // WebKit apparently chokes when the selector list in a CSS rule is huge.
-  // So we split the elemhide selectors into groups.
-  for (var i = 0; selectors.length > 0; i++)
-  {
-    var selector = selectors.splice(0, SELECTOR_GROUP_SIZE).join(", ");
-    style.sheet.insertRule(selector + " { display: none !important; }", i);
-  }
-}
-
 var typeMap = {
   "img": "IMAGE",
   "input": "IMAGE",
@@ -85,19 +26,16 @@ var typeMap = {
   "iframe": "SUBDOCUMENT"
 };
 
-function checkCollapse(event)
+function checkCollapse(element)
 {
-  var target = event.target;
-  var tag = target.localName;
-  var expectedEvent = (tag == "iframe" || tag == "frame" ? "load" : "error");
-  if (tag in typeMap && event.type == expectedEvent)
+  var tag = element.localName;
+  if (tag in typeMap)
   {
     // This element failed loading, did we block it?
-    var url = target.src;
-    if (!url)
+    var url = element.src;
+    if (!url || !/^https?:/i.test(url))
       return;
 
-    console.log("sendMessage -> should-collapse", event);
     ext.backgroundPage.sendMessage(
       {
         type: "should-collapse",
@@ -107,64 +45,235 @@ function checkCollapse(event)
 
       function(response)
       {
-        console.log("response to should collapse");
-        if (response && target.parentNode)
+        if (response && element.parentNode)
         {
+          var property = "display";
+          var value = "none";
+
           // <frame> cannot be removed, doing that will mess up the frameset
           if (tag == "frame")
-            target.style.setProperty("visibility", "hidden", "important");
-          else
-            target.style.setProperty("display", "none", "important");
+          {
+            property = "visibility";
+            value = "hidden";
+          }
+
+          // <input type="image"> elements try to load their image again
+          // when the "display" CSS property is set. So we have to check
+          // that it isn't already collapsed to avoid an infinite recursion.
+          if (element.style.getPropertyValue(property) != value ||
+              element.style.getPropertyPriority(property) != "important")
+            element.style.setProperty(property, value, "important");
         }
       }
     );
   }
 }
 
-// Converts relative to absolute URL
-// e.g.: foo.swf on http://example.com/whatever/bar.html
-//  -> http://example.com/whatever/foo.swf
-function relativeToAbsoluteUrl(url)
+function checkSitekey()
 {
-  // If URL is already absolute, don't mess with it
-  if (!url || /^[\w\-]+:/i.test(url))
-    return url;
-
-  // Leading / means absolute path
-  // Leading // means network path
-  if (url[0] == '/')
-  {
-    if (url[1] == '/')
-      return document.location.protocol + url;
-    else
-      return document.location.protocol + "//" + document.location.host + url;
-  }
-
-  // Remove filename and add relative URL to it
-  var base = document.baseURI.match(/.+\//);
-  if (!base)
-    return document.baseURI + "/" + url;
-  return base[0] + url;
-}
-
-function init()
-{
-  // Make sure this is really an HTML page, as Chrome runs these scripts on just about everything
-  if (!(document.documentElement instanceof HTMLElement))
-    return;
-
-  document.addEventListener("error", checkCollapse, true);
-  document.addEventListener("load", checkCollapse, true);
-
   var attr = document.documentElement.getAttribute("data-adblockkey");
   if (attr)
-    ext.backgroundPage.sendMessage({type: "add-key-exception", token: attr});
+    ext.backgroundPage.sendMessage({type: "add-sitekey", token: attr});
+}
+
+function isInlineFrame(element)
+{
+  var contentDocument;
+  try
+  {
+    contentDocument = element.contentDocument;
+  }
+  catch (e)
+  {
+    return false;  // third-party
+  }
+
+  if (!contentDocument)
+    return false;  // not a frame
+
+  return contentDocument.location.protocol == "about:";
+}
+
+function resolveURL(url)
+{
+  var a = document.createElement("a");
+  a.href = url;
+  return a.href;
+}
+
+function reinjectRulesWhenRemoved(document, style)
+{
+  var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+  if (!MutationObserver)
+    return;
+
+  var observer = new MutationObserver(function(mutations)
+  {
+    var isStyleRemoved = false;
+    for (var i = 0; i < mutations.length; i++)
+    {
+      if ([].indexOf.call(mutations[i].removedNodes, style) != -1)
+      {
+        isStyleRemoved = true;
+        break;
+      }
+    }
+    if (!isStyleRemoved)
+      return;
+
+    observer.disconnect();
+
+    var n = document.styleSheets.length;
+    if (n == 0)
+      return;
+
+    var stylesheet = document.styleSheets[n - 1];
+    ext.backgroundPage.sendMessage(
+      {type: "get-selectors"},
+
+      function(selectors)
+      {
+        while (selectors.length > 0)
+        {
+          var selector = selectors.splice(0, SELECTOR_GROUP_SIZE).join(", ");
+
+          // Using non-standard addRule() here. This is the only way
+          // to add rules at the end of a cross-origin stylesheet
+          // because we don't know how many rules are already in there
+          stylesheet.addRule(selector, "display: none !important;");
+        }
+      }
+    );
+  });
+
+  observer.observe(style.parentNode, {childList: true});
+}
+
+function convertSelectorsForShadowDOM(selectors)
+{
+  var result = [];
+  var prefix = "::content ";
+
+  for (var i = 0; i < selectors.length; i++)
+  {
+    var selector = selectors[i];
+    var start = 0;
+    var sep = "";
+
+    for (var j = 0; j < selector.length; j++)
+    {
+      var chr = selector[j];
+      if (chr == "\\")
+        j++;
+      else if (chr == sep)
+        sep = "";
+      else if (chr == '"' || chr == "'")
+        sep = chr;
+      else if (chr == "," && sep == "")
+      {
+        result.push(prefix + selector.substring(start, j));
+        start = j + 1;
+      }
+    }
+
+    result.push(prefix + selector.substring(start));
+  }
+
+  return result;
+}
+
+function init(document)
+{
+  // Use Shadow DOM if available to don't mess with web pages that rely on
+  // the order of their own <style> tags (#309).
+  //
+  // However, creating a shadow root breaks running CSS transitions. So we
+  // have to create the shadow root before transistions might start (#452).
+  //
+  // Also, we can't use shadow DOM on Google Docs, since it breaks printing
+  // there (#1770).
+  var shadow = null;
+  if ("createShadowRoot" in document.documentElement && document.domain != "docs.google.com")
+  {
+    shadow = document.documentElement.createShadowRoot();
+    shadow.appendChild(document.createElement("shadow"));
+  }
+
+  // Sets the currently used CSS rules for elemhide filters
+  var setElemhideCSSRules = function(selectors)
+  {
+    if (selectors.length == 0)
+      return;
+
+    var style = document.createElement("style");
+    style.setAttribute("type", "text/css");
+
+    if (shadow)
+    {
+      shadow.appendChild(style);
+      selectors = convertSelectorsForShadowDOM(selectors);
+    }
+    else
+    {
+      // Try to insert the style into the <head> tag, inserting directly under the
+      // document root breaks dev tools functionality:
+      // http://code.google.com/p/chromium/issues/detail?id=178109
+      (document.head || document.documentElement).appendChild(style);
+    }
+
+    var setRules = function()
+    {
+      // The sheet property might not exist yet if the
+      // <style> element was created for a sub frame
+      if (!style.sheet)
+      {
+        setTimeout(setRules, 0);
+        return;
+      }
+
+      // WebKit apparently chokes when the selector list in a CSS rule is huge.
+      // So we split the elemhide selectors into groups.
+      for (var i = 0; selectors.length > 0; i++)
+      {
+        var selector = selectors.splice(0, SELECTOR_GROUP_SIZE).join(", ");
+        style.sheet.insertRule(selector + " { display: none !important; }", i);
+      }
+    };
+
+    setRules();
+    reinjectRulesWhenRemoved(document, style);
+  };
+
+  document.addEventListener("error", function(event)
+  {
+    checkCollapse(event.target);
+  }, true);
+
+  document.addEventListener("load", function(event)
+  {
+    var element = event.target;
+
+    if (/^i?frame$/.test(element.localName))
+      checkCollapse(element);
+
+    // prior to Chrome 37, content scripts cannot run on about:blank,
+    // about:srcdoc and javascript: URLs. Moreover, as of Chrome 40
+    // "load" and "error" events aren't dispatched there. So we have
+    // to apply element hiding and collapsing from the parent frame.
+    if (/\bChrome\//.test(navigator.userAgent) && isInlineFrame(element))
+    {
+      init(element.contentDocument);
+
+      for (var tagName in typeMap)
+        Array.prototype.forEach.call(element.contentDocument.getElementsByTagName(tagName), checkCollapse);
+    }
+  }, true);
 
   ext.backgroundPage.sendMessage({type: "get-selectors"}, setElemhideCSSRules);
 }
 
-// In Chrome 18 the document might not be initialized yet
-if (document.documentElement)
-  init();
-else
-  window.setTimeout(init, 0);
+if (document instanceof HTMLDocument)
+{
+  checkSitekey();
+  init(document);
+}

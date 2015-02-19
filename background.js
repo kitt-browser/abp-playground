@@ -1,6 +1,6 @@
 /*
- * This file is part of Adblock Plus <http://adblockplus.org/>,
- * Copyright (C) 2006-2014 Eyeo GmbH
+ * This file is part of Adblock Plus <https://adblockplus.org/>,
+ * Copyright (C) 2006-2015 Eyeo GmbH
  *
  * Adblock Plus is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -30,9 +30,22 @@ with(require("subscriptionClasses"))
 }
 with(require("whitelisting"))
 {
-  this.isWhitelisted = isWhitelisted;
+  this.isPageWhitelisted = isPageWhitelisted;
   this.isFrameWhitelisted = isFrameWhitelisted;
-  this.processKeyException = processKeyException;
+  this.processKey = processKey;
+  this.getKey = getKey;
+}
+with(require("url"))
+{
+  this.stringifyURL = stringifyURL;
+  this.isThirdParty = isThirdParty;
+  this.extractHostFromFrame = extractHostFromFrame;
+}
+with(require("icon"))
+{
+  this.updateIcon = updateIcon;
+  this.startIconAnimation = startIconAnimation;
+  this.stopIconAnimation = stopIconAnimation;
 }
 var FilterStorage = require("filterStorage").FilterStorage;
 var ElemHide = require("elemHide").ElemHide;
@@ -40,8 +53,9 @@ var defaultMatcher = require("matcher").defaultMatcher;
 var Prefs = require("prefs").Prefs;
 var Synchronizer = require("synchronizer").Synchronizer;
 var Utils = require("utils").Utils;
-var Notification = require("notification").Notification;
+var NotificationStorage = require("notification").Notification;
 var initAntiAdblockNotification = require("antiadblockInit").initAntiAdblockNotification;
+var parseFilters = require("filterValidation").parseFilters;
 
 // Some types cannot be distinguished
 RegExpFilter.typeMap.OBJECT_SUBREQUEST = RegExpFilter.typeMap.OBJECT;
@@ -51,7 +65,7 @@ RegExpFilter.typeMap.MEDIA = RegExpFilter.typeMap.FONT = RegExpFilter.typeMap.OT
 // https://code.google.com/p/chromium/issues/detail?id=291485
 var canUseChromeNotifications = require("info").platform == "chromium"
   && "notifications" in chrome
-  && (navigator.platform.indexOf("Linux") == -1 || parseInt(require("info").applicationVersion) > 34);
+  && (navigator.platform.indexOf("Linux") == -1 || parseInt(require("info").applicationVersion, 10) > 34);
 
 var seenDataCorruption = false;
 var filterlistsReinitialized = false;
@@ -59,36 +73,31 @@ require("filterNotifier").FilterNotifier.addListener(function(action)
 {
   if (action == "load")
   {
-    console.log('LOAD filters');
-    var importingOldData = importOldData();
-
     var addonVersion = require("info").addonVersion;
     var prevVersion = ext.storage.currentVersion;
-
-    console.log('load filters', FilterStorage.firstRun, FilterStorage.subscriptions.length);
 
     // There are no filters stored so we need to reinitialize all filterlists
     if (!FilterStorage.firstRun && FilterStorage.subscriptions.length === 0)
     {
-      console.log('1');
       filterlistsReinitialized = true;
       prevVersion = null;
     }
 
-    console.log('load filters', prevVersion);
-
     if (prevVersion != addonVersion || FilterStorage.firstRun)
     {
-      console.log('2');
       seenDataCorruption = prevVersion && FilterStorage.firstRun;
       ext.storage.currentVersion = addonVersion;
-      if (!importingOldData)
-        addSubscription(prevVersion);
+      addSubscription(prevVersion);
     }
 
     if (canUseChromeNotifications)
       initChromeNotifications();
     initAntiAdblockNotification();
+
+    // The "Hide placeholders" option has been removed from the UI in 1.8.8.1285
+    // So we reset the option for users updating from older versions.
+    if (prevVersion && Services.vc.compare(prevVersion, "1.8.8.1285") < 0)
+      Prefs.hidePlaceholders = true;
   }
 
   // update browser actions when whitelisting might have changed,
@@ -100,6 +109,8 @@ require("filterNotifier").FilterNotifier.addListener(function(action)
 // Special-case domains for which we cannot use style-based hiding rules.
 // See http://crbug.com/68705.
 var noStyleRulesHosts = ["mail.google.com", "mail.yahoo.com", "www.google.com"];
+
+var htmlPages = new ext.PageMap();
 
 function removeDeprecatedOptions()
 {
@@ -119,36 +130,22 @@ var activeNotification = null;
 var contextMenuItem = {
   title: ext.i18n.getMessage("block_element"),
   contexts: ["image", "video", "audio"],
-  onclick: function(srcUrl, page)
+  onclick: function(page)
   {
-    if (srcUrl)
-      page.sendMessage({type: "clickhide-new-filter", filter: srcUrl});
+    page.sendMessage({type: "clickhide-new-filter"});
   }
 };
 
 // Adds or removes browser action icon according to options.
 function refreshIconAndContextMenu(page)
 {
-  console.log('refreshIconAndContextMenu');
-  var whitelisted = isWhitelisted(page.url);
-
-  var iconFilename;
-  if (whitelisted && require("info").platform != "safari")
-    // There is no grayscale version of the icon for whitelisted pages
-    // when using Safari, because icons are grayscale already and icons
-    // aren't per page in Safari.
-    iconFilename = "icons/abp-$size-whitelisted.png";
-  else
-    iconFilename = "icons/abp-$size.png";
-
-  page.browserAction.setIcon(iconFilename);
-  iconAnimation.registerPage(page, iconFilename);
+  var whitelisted = isPageWhitelisted(page);
+  updateIcon(page, whitelisted);
 
   // show or hide the context menu entry dependent on whether
   // adblocking is active on that page
   page.contextMenus.removeAll();
-
-  if (Prefs.shouldShowBlockElementMenu && !whitelisted && /^https?:/.test(page.url))
+  if (Prefs.shouldShowBlockElementMenu && !whitelisted && htmlPages.has(page))
     page.contextMenus.create(contextMenuItem);
 }
 
@@ -161,38 +158,11 @@ function refreshIconAndContextMenuForAllPages()
 }
 
 /**
- * Old versions for Opera stored patterns.ini in the localStorage object, this
- * will import it into FilterStorage properly.
- * @return {Boolean} true if data import is in progress
- */
-function importOldData()
-{
-  //KITTHACK
-  return false;
-  if ("patterns.ini" in localStorage)
-  {
-    FilterStorage.loadFromDisk(localStorage["patterns.ini"]);
-
-    var remove = [];
-    for (var key in localStorage)
-      if (key.indexOf("patterns.ini") == 0 || key.indexOf("patterns-backup") == 0)
-        remove.push(key);
-    for (var i = 0; i < remove.length; i++)
-      delete localStorage[remove[i]];
-
-    return true;
-  }
-  else
-    return false;
-}
-
-/**
  * This function is called on an extension update. It will add the default
  * filter subscription if necessary.
  */
 function addSubscription(prevVersion)
 {
-  console.log('addSubscription', prevVersion);
   // Make sure to remove "Recommended filters", no longer necessary
   var toRemove = "https://easylist-downloads.adblockplus.org/chrome_supplement.txt";
   if (toRemove in FilterStorage.knownSubscriptions)
@@ -253,8 +223,6 @@ function addSubscription(prevVersion)
     }
   }
 
-  console.log('aaaaaaaaaa', addSubscription, addAcceptable);
-
   if (!addSubscription && !addAcceptable)
     return;
 
@@ -265,16 +233,12 @@ function addSubscription(prevVersion)
 
   if (addSubscription)
   {
-    console.log('XHR to load filters');
     // Load subscriptions data
     var request = new XMLHttpRequest();
     request.open("GET", "subscriptions.xml");
-    //request.setRequestHeader('Content-Type', 'application/xml');
     request.addEventListener("load", function()
     {
-      //console.log('XHR LOAD EVENT', request, request.getAllResponseHeaders());
-      var doc = (new DOMParser()).parseFromString(request.response, "application/xml");
-      var node = Utils.chooseFilterSubscription(doc);
+      var node = Utils.chooseFilterSubscription(request.responseXML.getElementsByTagName("subscription"));
       var subscription = (node ? Subscription.fromURL(node.getAttribute("url")) : null);
       if (subscription)
       {
@@ -288,9 +252,6 @@ function addSubscription(prevVersion)
           notifyUser();
       }
     }, false);
-    request.addEventListener("error", function() {
-      console.log('XHR to load filters ERROR', arguments);
-    }, false);
     request.send(null);
   }
   else
@@ -303,44 +264,17 @@ Prefs.addListener(function(name)
     refreshIconAndContextMenuForAllPages();
 });
 
-/**
-  * Opens options page or focuses an existing one, within the last focused window.
-  * @param {Function} callback  function to be called with the
-                                Page object of the options page
-  */
-function openOptions(callback)
-{
-  ext.pages.query({lastFocusedWindow: true}, function(pages)
-  {
-    var optionsUrl = ext.getURL("options.html");
-
-    for (var i = 0; i < pages.length; i++)
-    {
-      var page = pages[i];
-      if (page.url == optionsUrl)
-      {
-        page.activate();
-        if (callback)
-          callback(page);
-        return;
-      }
-    }
-
-    ext.pages.open(optionsUrl, callback);
-  });
-}
-
 function prepareNotificationIconAndPopup()
 {
   var animateIcon = (activeNotification.type !== "question");
   activeNotification.onClicked = function()
   {
     if (animateIcon)
-      iconAnimation.stop();
+      stopIconAnimation();
     notificationClosed();
   };
   if (animateIcon)
-    iconAnimation.update(activeNotification.type);
+    startIconAnimation(activeNotification.type);
 }
 
 function openNotificationLinks()
@@ -361,8 +295,8 @@ function notificationButtonClick(buttonIndex)
 {
   if (activeNotification.type === "question")
   {
-    Notification.triggerQuestionListeners(activeNotification.id, buttonIndex === 0);
-    Notification.markAsShown(activeNotification.id);
+    NotificationStorage.triggerQuestionListeners(activeNotification.id, buttonIndex === 0);
+    NotificationStorage.markAsShown(activeNotification.id);
     activeNotification.onClicked();
   }
   else if (activeNotification.links && activeNotification.links[buttonIndex])
@@ -427,16 +361,7 @@ function showNotification(notification)
   activeNotification = notification;
   if (activeNotification.type === "critical" || activeNotification.type === "question")
   {
-    var hasWebkitNotifications = typeof webkitNotifications !== "undefined";
-    if (hasWebkitNotifications && "createHTMLNotification" in webkitNotifications)
-    {
-      var notification = webkitNotifications.createHTMLNotification("notification.html");
-      notification.show();
-      prepareNotificationIconAndPopup();
-      return;
-    }
-
-    var texts = Notification.getLocalizedTexts(notification);
+    var texts = NotificationStorage.getLocalizedTexts(notification);
     var title = texts.title || "";
     var message = texts.message ? texts.message.replace(/<\/?(a|strong)>/g, "") : "";
     var iconUrl = ext.getURL("icons/abp-128.png");
@@ -471,17 +396,25 @@ function showNotification(notification)
         chrome.notifications.create("", opts, function() {});
       });
     }
-    else if (hasWebkitNotifications && "createNotification" in webkitNotifications && activeNotification.type !== "question")
+    else if ("Notification" in window && activeNotification.type !== "question")
     {
       if (hasLinks)
         message += " " + ext.i18n.getMessage("notification_without_buttons");
 
       imgToBase64(iconUrl, function(iconData)
       {
-        var notification = webkitNotifications.createNotification(iconData, title, message);
-        notification.show();
-        notification.addEventListener("click", openNotificationLinks, false);
-        notification.addEventListener("close", notificationClosed, false);
+        var notification = new Notification(
+          title,
+          {
+            lang: Utils.appLocale,
+            dir: ext.i18n.getMessage("@@bidi_dir"),
+            body: message,
+            icon: iconData
+          }
+        );
+
+        notification.addEventListener("click", openNotificationLinks);
+        notification.addEventListener("close", notificationClosed);
       });
     }
     else
@@ -534,13 +467,11 @@ ext.onMessage.addListener(function (msg, sender, sendResponse)
     case "get-selectors":
       var selectors = [];
 
-      console.log('get-selectors', msg, sender);
-
       if (!isFrameWhitelisted(sender.page, sender.frame, "DOCUMENT") &&
           !isFrameWhitelisted(sender.page, sender.frame, "ELEMHIDE"))
       {
         var noStyleRules = false;
-        var host = extractHostFromURL(sender.frame.url);
+        var host = extractHostFromFrame(sender.frame);
         for (var i = 0; i < noStyleRulesHosts.length; i++)
         {
           var noStyleHost = noStyleRulesHosts[i];
@@ -563,17 +494,19 @@ ext.onMessage.addListener(function (msg, sender, sendResponse)
       sendResponse(selectors);
       break;
     case "should-collapse":
-      console.log('should-collapse');
       if (isFrameWhitelisted(sender.page, sender.frame, "DOCUMENT"))
       {
         sendResponse(false);
         break;
       }
 
-      var requestHost = extractHostFromURL(msg.url);
-      var documentHost = extractHostFromURL(sender.frame.url);
-      var thirdParty = isThirdParty(requestHost, documentHost);
-      var filter = defaultMatcher.matchesAny(msg.url, msg.mediatype, documentHost, thirdParty);
+      var url = new URL(msg.url);
+      var documentHost = extractHostFromFrame(sender.frame);
+      var filter = defaultMatcher.matchesAny(
+        stringifyURL(url), msg.mediatype,
+        documentHost, isThirdParty(url, documentHost)
+      );
+
       if (filter instanceof BlockingFilter)
       {
         var collapse = filter.collapse;
@@ -589,38 +522,51 @@ ext.onMessage.addListener(function (msg, sender, sendResponse)
       // The browser action popup asks us this.
       if(sender.page)
       {
-        console.log('get-domain-enabled-state');
-        sendResponse({enabled: !isWhitelisted(sender.page.url)});
+        sendResponse({enabled: !isPageWhitelisted(sender.page)});
         return;
       }
       break;
     case "add-filters":
-      if (msg.filters && msg.filters.length)
+      var filters;
+      try
       {
-        for (var i = 0; i < msg.filters.length; i++)
-          FilterStorage.addFilter(Filter.fromText(msg.filters[i]));
+        filters = parseFilters(msg.text);
       }
+      catch (error)
+      {
+        sendResponse({status: "invalid", error: error});
+        break;
+      }
+
+      for (var i = 0; i < filters.length; i++)
+        FilterStorage.addFilter(filters[i]);
+
+      sendResponse({status: "ok"});
       break;
     case "add-subscription":
-      openOptions(function(page)
+      ext.showOptions(function(page)
       {
         page.sendMessage(msg);
       });
       break;
-    case "add-key-exception":
-      processKeyException(msg.token, sender.page, sender.frame);
+    case "add-sitekey":
+      processKey(msg.token, sender.page, sender.frame);
+      break;
+    case "report-html-page":
+      htmlPages.set(sender.page, null);
+      refreshIconAndContextMenu(sender.page);
       break;
     case "forward":
       if (sender.page)
       {
-        sender.page.sendMessage(msg.payload, sendResponse);
-        // Return true to indicate that we want to call
-        // sendResponse asynchronously
-        return true;
+        if (msg.expectsResponse)
+        {
+          sender.page.sendMessage(msg.payload, sendResponse);
+          return true;
+        }
+
+        sender.page.sendMessage(msg.payload);
       }
-      break;
-    default:
-      sendResponse({});
       break;
   }
 });
@@ -634,7 +580,7 @@ ext.pages.onLoading.addListener(function(page)
 
 setTimeout(function()
 {
-  var notificationToShow = Notification.getNextToShow();
+  var notificationToShow = NotificationStorage.getNextToShow();
   if (notificationToShow)
     showNotification(notificationToShow);
 }, 3 * 60 * 1000);

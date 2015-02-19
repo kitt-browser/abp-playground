@@ -9,13 +9,12 @@
       "lib/adblockplus.js", 
       "lib/punycode.js", 
       "lib/publicSuffixList.js", 
-      "lib/basedomain.js", 
       "lib/sha1.js", 
       "lib/jsbn.js", 
       "lib/rsa.js", 
       "webrequest.js", 
+      "messageResponder.js", 
       "popupBlocker.js", 
-      "iconAnimation.js", 
       "background.js"
     ]
   }, 
@@ -40,17 +39,6 @@
         "https://*/*"
       ], 
       "run_at": "document_start"
-    }, 
-    {
-      "all_frames": true, 
-      "js": [
-        "include.postload.js"
-      ], 
-      "matches": [
-        "http://*/*", 
-        "https://*/*"
-      ], 
-      "run_at": "document_end"
     }
   ], 
   "default_locale": "en_US", 
@@ -76,7 +64,8 @@
     "unlimitedStorage", 
     "notifications"
   ], 
-  "version": "1.8.3", 
+  "short_name": "adblock-plus", 
+  "version": "1.8.10.1331", 
   "web_accessible_resources": [
     "block.html"
   ]
