@@ -27,34 +27,31 @@
     "message": "När denna popup stängs, klicka (eller högerklicka) ett objekt på sidan."
   },
   "description_chrome": {
-    "message": "Fri adblock verktyg för Chrome: Blockerar irriterande videoannonser på YouTube, Facebook-annonser, banners och mycket mer."
+    "message": "Över 50 miljoner användare. En gratis annonsblockerare för Chrome som blockerar ALLA irriterande annonser, malware och spårning."
   },
   "description_opera": {
-    "message": "Gratis reklamblockerare för Opera: Blockerar irriterande videoannonser på YouTube, Facebook-annonser, banners och mycket mer."
+    "message": "Över 50 miljoner användare. En gratis annonsblockerare för Opera som blockerar ALLA irriterande annonser, malware och spårning."
   },
   "description_safari": {
-    "message": "Gratis reklamblockerare för Safari: Blockerar irriterande videoannonser på YouTube, Facebook-annonser, banners och mycket mer."
-  },
-  "disable_inline": {
-    "message": "Avaktivera infogade textannonser"
+    "message": "Över 50 miljoner användare. En gratis annonsblockerare för Safari som blockerar ALLA irriterande annonser, malware och spårning."
   },
   "disabled_for_site": {
-    "message": "<strong>Avaktiverad</strong> på denna webbplats"
+    "message": "<strong>Avaktiverat</strong> på denna webbplats"
   },
   "disabled_for_these_domains": {
     "message": "Adblock Plus är avaktiverad för domänerna i denna lista. Du kan lägga till en domän via Adblock Plus-ikonen i adressfältet eller genom att skriva domännamnet (inte URL) i textboxen och klicka på \"Lägg till domän\"."
   },
   "easy_create_filter": {
-    "message": "Block-element"
+    "message": "Blockera objekt"
   },
   "edit_filters_raw": {
     "message": "Redigera filter som ren text"
   },
   "enable_only_the": {
-    "message": "Endast aktivera filtret listor du behöver. Alltför många kan få din webbläsare att inte svara."
+    "message": "Aktivera endast de filterlistor du behöver. För många kan göra att webbläsaren inte svarar."
   },
   "enabled_for_site": {
-    "message": "<strong>Ja</strong> på denna webbplats"
+    "message": "<strong>Aktiverat</strong> på denna webbplats"
   },
   "filter_lists": {
     "message": "Filterlistor"
@@ -140,6 +137,9 @@
   "firstRun_features": {
     "message": "Adblock Plus kan göra mer än att blockera reklam"
   },
+  "firstRun_filterlistsReinitializedWarning": {
+    "message": "Det verkar som ett problem har orsakat att alla filter har tagits bort och det gick inte att återställa en säkerhetskopia. Vi var därför tvunga att att återställa dina Filter och Acceptabla Annonser inställningar. Vänligen kontrollera dina Filterlistor och Acceptabla Annonser inställningar i <a>Adblock Plus alternativ</a>."
+  },
   "firstRun_legacySafariWarning": {
     "message": "Du använder en äldre version av Safari som inte stödjs av Adblock Plus. Adblock Plus kanske inte fungerar korrekt eller försämrar användarupplevelsen på vissa hemsidor. Vi rekommenderar starkt att antingen uppdatera till Safari 6.1.1 eller högre (tillgänglig på OS X 10.8 Mountain Lion), Safari 7.0.1 eller högre (tillgänglig på OS X 10.9 Mavericks), eller att använda den senaste versionen av Mozilla Firefox, Google Chrome eller Opera."
   },
@@ -159,7 +159,7 @@
     "message": "PÅ"
   },
   "found_a_bug": {
-    "message": "Hittat ett fel eller vill du översätta Adblock Plus till ett annat språk? Vänligen, <a>meddela här</a>."
+    "message": "Hittat ett fel? Vill du översätta Adblock Plus till ett annat språk? Vänligen, <a>skapa en förfrågan här</a>."
   },
   "general": {
     "message": "Allmänt"
@@ -182,6 +182,14 @@
   "global_subscription_invalid_location": {
     "message": "Platsen du angivit är antingen ogiltig eller så har du angivit ett felaktigt filnamn."
   },
+  "invalid_css_selector": {
+    "message": "$selector$ är inte en giltig CSS-väljare",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "Senast uppdaterad den $date$ $time$",
     "placeholders": {
@@ -201,29 +209,34 @@
       }
     }
   },
+  "line": {
+    "message": "Rad $number$",
+    "placeholders": {
+      "number": {
+        "content": "$1"
+      }
+    }
+  },
   "name": {
     "message": "Adblock Plus"
   },
   "name_devbuild": {
-    "message": "Adblock Plus utvecklings version"
+    "message": "Adblock Plus utvecklingsversion"
   },
   "notification_with_buttons": {
-    "message": "Klicka på 'OK' för att öppna alla länkar i detta meddelandet."
+    "message": "Klicka på 'OK' för att öppna alla länkar i detta meddelande."
   },
   "notification_without_buttons": {
-    "message": "Klicka på meddelandet för att öppna länkar i den."
+    "message": "Klicka på meddelandet för att öppna alla länkar i det."
   },
   "options": {
     "message": "Adblock Plus Alternativ"
   },
   "options_short": {
-    "message": "Alternativ"
+    "message": "Inställningar"
   },
   "out_of_date_lists": {
     "message": "Utdaterade listor uppdateras periodiskt."
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "Dölj platshållare för blockerade element"
   },
   "overlay_notification_button_close": {
     "message": "Sluta"
@@ -276,13 +289,13 @@
     }
   },
   "stats_share_title": {
-    "message": "Dela med dig av dessa nummer"
+    "message": "Dela dessa nummer"
   },
   "stats_show_iconnumber": {
-    "message": "Visa nummer i fältet"
+    "message": "Visa nummer vid ikon"
   },
   "stats_title": {
-    "message": "Annonser blockerad"
+    "message": "Annonser blockerade"
   },
   "subscriptionSelection_location_label": {
     "message": "Plats för filter:"
@@ -292,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Rubrik för prenumeration:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Filterlistrubriker är inte tillåtna här"
   },
   "update_now": {
     "message": "Uppdatera nu"

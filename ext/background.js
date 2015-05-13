@@ -22,15 +22,11 @@
 
 (function()
 {
-  var nonEmptyPageMaps = {
-    __proto__: null
-  };
+  var nonEmptyPageMaps = Object.create(null);
   var pageMapCounter = 0;
   var PageMap = ext.PageMap = function()
   {
-    this._map = {
-      __proto__: null
-    };
+    this._map = Object.create(null);
     this._id = ++pageMapCounter;
   };
   PageMap.prototype = {
@@ -41,6 +37,10 @@
       {
         delete nonEmptyPageMaps[this._id];
       }
+    },
+    keys: function()
+    {
+      return Object.keys(this._map).map(ext._getPage);
     },
     get: function(page)
     {
@@ -80,14 +80,14 @@
   var Page = ext.Page = function(tab)
   {
     this._id = tab.id;
-    this._url = tab.url;
+    this._url = tab.url && new URL(tab.url);
     this.browserAction = new BrowserAction(tab.id);
     this.contextMenus = new ContextMenus(this);
   };
   Page.prototype = {
     get url()
     {
-      if (this._url != null)
+      if (this._url)
       {
         return this._url;
       }
@@ -101,22 +101,21 @@
         }
       }
     },
-    activate: function()
-    {
-      chrome.tabs.update(this._id,
-      {
-        selected: true
-      });
-    },
     sendMessage: function(message, responseCallback)
     {
       chrome.tabs.sendMessage(this._id, message, responseCallback);
     }
   };
+  ext._getPage = function(id)
+  {
+    return new Page(
+    {
+      id: parseInt(id, 10)
+    });
+  };
   ext.pages = {
     open: function(url, callback)
     {
-      //console.log('pages.open');
       if (callback)
       {
         chrome.tabs.create(
@@ -126,15 +125,13 @@
         {
           var onUpdated = function(tabId, changeInfo, tab)
           {
-            //console.log('pages.open onUpdated');
             if (tabId == openedTab.id && changeInfo.status == "complete")
             {
               chrome.tabs.onUpdated.removeListener(onUpdated);
               callback(new Page(tab));
             }
           };
-          //console.log('pages.open before onUpdated listener');
-          //chrome.tabs.onUpdated.addListener(onUpdated);
+          chrome.tabs.onUpdated.addListener(onUpdated);
         });
       }
       else
@@ -167,7 +164,6 @@
     },
     onLoading: new ext._EventTarget()
   };
-  /*
   chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
   {
     if (changeInfo.status == "loading")
@@ -175,66 +171,123 @@
       ext.pages.onLoading._dispatch(new Page(tab));
     }
   });
-  */
   chrome.webNavigation.onBeforeNavigate.addListener(function(details)
   {
     if (details.frameId == 0)
     {
       ext._removeFromAllPageMaps(details.tabId);
+      chrome.tabs.get(details.tabId, function()
+      {
+        if (chrome.runtime.lastError)
+        {
+          ext.pages.onLoading._dispatch(new Page(
+          {
+            id: details.tabId,
+            url: details.url
+          }));
+        }
+      });
     }
   });
-  /*
-  chrome.tabs.onRemoved.addListener(function(tabId)
+
+  function forgetTab(tabId)
   {
     ext._removeFromAllPageMaps(tabId);
     delete framesOfTabs[tabId];
+  }
+  chrome.tabs.onReplaced.addListener(function(addedTabId, removedTabId)
+  {
+    forgetTab(removedTabId);
   });
-  */
+  chrome.tabs.onRemoved.addListener(forgetTab);
   var BrowserAction = function(tabId)
   {
     this._tabId = tabId;
+    this._changes = null;
   };
   BrowserAction.prototype = {
+    _applyChanges: function()
+    {
+      if ("iconPath" in this._changes)
+      {
+        chrome.browserAction.setIcon(
+        {
+          tabId: this._tabId,
+          path: {
+            19: this._changes.iconPath.replace("$size", "19"),
+            38: this._changes.iconPath.replace("$size", "38")
+          }
+        });
+      }
+      if ("badgeText" in this._changes)
+      {
+        chrome.browserAction.setBadgeText(
+        {
+          tabId: this._tabId,
+          text: this._changes.badgeText
+        });
+      }
+      if ("badgeColor" in this._changes)
+      {
+        chrome.browserAction.setBadgeBackgroundColor(
+        {
+          tabId: this._tabId,
+          color: this._changes.badgeColor
+        });
+      }
+      this._changes = null;
+    },
+    _queueChanges: function()
+    {
+      chrome.tabs.get(this._tabId, function()
+      {
+        if (chrome.runtime.lastError)
+        {
+          var onReplaced = function(addedTabId, removedTabId)
+          {
+            if (addedTabId == this._tabId)
+            {
+              chrome.tabs.onReplaced.removeListener(onReplaced);
+              this._applyChanges();
+            }
+          }.bind(this);
+          chrome.tabs.onReplaced.addListener(onReplaced);
+        }
+        else
+        {
+          this._applyChanges();
+        }
+      }.bind(this));
+    },
+    _addChange: function(name, value)
+    {
+      if (!this._changes)
+      {
+        this._changes = {};
+        this._queueChanges();
+      }
+      this._changes[name] = value;
+    },
     setIcon: function(path)
     {
-      var paths = {};
-      for (var i = 1; i <= 2; i++)
-      {
-        var size = i * 19;
-        paths[size] = path.replace("$size", size);
-      }
-      chrome.browserAction.setIcon(
-      {
-        tabId: this._tabId,
-        path: paths
-      });
+      this._addChange("iconPath", path);
     },
     setBadge: function(badge)
     {
       if (!badge)
       {
-        chrome.browserAction.setBadgeText(
-        {
-          tabId: this._tabId,
-          text: ""
-        });
-        return;
+        this._addChange("badgeText", "");
       }
-      if ("color" in badge)
+      else
       {
-        chrome.browserAction.setBadgeBackgroundColor(
+        if ("number" in badge)
         {
-          tabId: this._tabId,
-          color: badge.color
-        });
-      }
-      if ("number" in badge)
-      {
-        chrome.browserAction.setBadgeText(
+          this._addChange("badgeText", badge.number.toString());
+        }
+        if ("color" in badge)
         {
-          tabId: this._tabId,
-          text: badge.number.toString()
-        });
+          this._addChange("badgeColor", badge.color);
+        }
       }
     }
   };
@@ -253,10 +306,8 @@
       lastFocusedWindow: true
     }, function(tabs)
     {
-      console.log('before removeAll');
       chrome.contextMenus.removeAll(function()
       {
-        console.log('removeAll callback');
         contextMenuUpdating = false;
         if (tabs.length == 0)
         {
@@ -278,7 +329,7 @@
             contexts: item.contexts,
             onclick: function(info, tab)
             {
-              item.onclick(info.srcUrl, new Page(tab));
+              item.onclick(new Page(tab));
             }
           });
         });
@@ -306,48 +357,75 @@
       updateContextMenu();
     }
   };
-  //chrome.tabs.onActivated.addListener(updateContextMenu);
-  /*chrome.windows.onFocusChanged.addListener(function(windowId)
+  chrome.tabs.onActivated.addListener(updateContextMenu);
+  chrome.windows.onFocusChanged.addListener(function(windowId)
   {
     if (windowId != chrome.windows.WINDOW_ID_NONE)
     {
       updateContextMenu();
     }
-  });*/
-  var framesOfTabs = {
-    __proto__: null
-  };
+  });
+  var framesOfTabs = Object.create(null);
   ext.getFrame = function(tabId, frameId)
   {
     return (framesOfTabs[tabId] || {})[frameId];
   };
+  var handlerBehaviorChangedQuota = chrome.webRequest.MAX_HANDLER_BEHAVIOR_CHANGED_CALLS_PER_10_MINUTES;
+
+  function propagateHandlerBehaviorChange()
+  {
+    if (handlerBehaviorChangedQuota > 0)
+    {
+      chrome.webNavigation.onBeforeNavigate.removeListener(propagateHandlerBehaviorChange);
+      chrome.webRequest.handlerBehaviorChanged();
+      handlerBehaviorChangedQuota--;
+      setTimeout(function()
+      {
+        handlerBehaviorChangedQuota++;
+      }, 600000);
+    }
+  }
   ext.webRequest = {
-    onBeforeRequest: new ext._EventTarget(true),
-    handlerBehaviorChanged: chrome.webRequest.handlerBehaviorChanged
+    onBeforeRequest: new ext._EventTarget(),
+    handlerBehaviorChanged: function()
+    {
+      var onBeforeNavigate = chrome.webNavigation.onBeforeNavigate;
+      if (!onBeforeNavigate.hasListener(propagateHandlerBehaviorChange))
+      {
+        onBeforeNavigate.addListener(propagateHandlerBehaviorChange);
+      }
+    }
   };
-  //console.log('aaaaa');
+  if (parseInt(navigator.userAgent.match(/\bChrome\/(\d+)/)[1], 10) >= 38)
+  {
+    ext.webRequest.indistinguishableTypes = [
+      ["OTHER", "OBJECT", "OBJECT_SUBREQUEST"]
+    ];
+  }
+  else
+  {
+    ext.webRequest.indistinguishableTypes = [
+      ["OBJECT", "OBJECT_SUBREQUEST"],
+      ["OTHER", "MEDIA", "FONT"]
+    ];
+  }
   chrome.tabs.query(
   {}, function(tabs)
   {
-    //console.log('TOM: tabs query');
     tabs.forEach(function(tab)
     {
-      //console.log('TOM: before getAllFrames');
       chrome.webNavigation.getAllFrames(
       {
         tabId: tab.id
       }, function(details)
       {
-        //console.log('TOM: getAllFrames', details);
         if (details && details.length > 0)
         {
-          var frames = framesOfTabs[tab.id] = {
-            __proto__: null
-          };
+          var frames = framesOfTabs[tab.id] = Object.create(null);
           for (var i = 0; i < details.length; i++)
           {
             frames[details[i].frameId] = {
-              url: details[i].url,
+              url: new URL(details[i].url),
               parent: null
             };
           }
@@ -363,20 +441,15 @@
       });
     });
   });
-  console.log('top webrequest before adddlistener');
   chrome.webRequest.onBeforeRequest.addListener(function(details)
   {
     try
     {
-      //console.log('  >>> onBeforeRequest -> details url:', details.url)
       if (details.tabId == -1)
       {
         return;
       }
       var isMainFrame = details.type == "main_frame" || details.frameId == 0 && !(details.tabId in framesOfTabs);
-      //console.log('  >>> URL', details.url);
-      //console.log('  >>> frame id', details.frameId);
-      //console.log('  >>> main frame', isMainFrame);
       var frames = null;
       if (!isMainFrame)
       {
@@ -384,47 +457,43 @@
       }
       if (!frames)
       {
-        frames = framesOfTabs[details.tabId] = {
-          __proto__: null
-        };
+        frames = framesOfTabs[details.tabId] = Object.create(null);
       }
       var frame = null;
+      var url = new URL(details.url);
       if (!isMainFrame)
       {
         var frameId;
+        var requestType;
         if (details.type == "sub_frame")
         {
-          //console.log('  >>> sub_frame');
           frameId = details.parentFrameId;
+          requestType = "SUBDOCUMENT";
         }
         else
         {
-          //console.log('  >>> not sub_frame', details.type);
           frameId = details.frameId;
+          requestType = details.type.toUpperCase();
         }
         frame = frames[frameId] || frames[Object.keys(frames)[0]];
-        //console.log('  >>> frames', JSON.stringify(frames, null, 2));
-        //console.log('  >>>', frameId);
-        //console.log('  >>> DETAILS URL:', JSON.stringify(details, null, 2), "frame:", JSON.stringify(frame, null, 2));
-        var shouldCancel = (frame && !ext.webRequest.onBeforeRequest._dispatch(details.url, details.type, new Page(
+        if (frame)
         {
-          id: details.tabId
-        }), frame));
-        //console.log("Should cancel", shouldCancel, frame, details);
-        if (shouldCancel) {
-          //console.log('  >> CANCELLING web request to', details.URL);
-          return {
-            cancel: true
-          };
-        } else {
-          //console.log("NOT CANCELLING REQUEST", details.URL);
-       }
+          var results = ext.webRequest.onBeforeRequest._dispatch(url, requestType, new Page(
+          {
+            id: details.tabId
+          }), frame);
+          if (results.indexOf(false) != -1)
+          {
+            return {
+              cancel: true
+            };
+          }
+        }
       }
       if (isMainFrame || details.type == "sub_frame")
       {
-        //console.log('  >>> main frame or subframe');
         frames[details.frameId] = {
-          url: details.url,
+          url: url,
           parent: frame
         };
       }
@@ -435,16 +504,16 @@
     }
   },
   {
-    urls: ["<all_urls>"]
+    urls: ["http://*/*", "https://*/*"]
   }, ["blocking"]);
-  console.log('top runtime.onMessage before adddlistener');
   chrome.runtime.onMessage.addListener(function(message, rawSender, sendResponse)
   {
-    console.log('onMessage.addListener', message, rawSender);
-    var sender = {
-      page: new Page(rawSender.tab),
-      frame: {
-        url: rawSender.url,
+    var sender = {};
+    if ("tab" in rawSender)
+    {
+      sender.page = new Page(rawSender.tab);
+      sender.frame = {
+        url: new URL(rawSender.url),
         get parent()
         {
           var frames = framesOfTabs[rawSender.tab.id];
@@ -452,21 +521,164 @@
           {
             return null;
           }
-          for (var frameId in frames)
+          if ("frameId" in rawSender)
           {
-            if (frames[frameId].url == rawSender.url)
+            var frame = frames[rawSender.frameId];
+            if (frame)
             {
-              return frames[frameId].parent;
+              return frame.parent;
+            }
+          }
+          else
+          {
+            for (var frameId in frames)
+            {
+              if (frames[frameId].url.href == this.url.href)
+              {
+                return frames[frameId].parent;
+              }
             }
           }
           return frames[0];
         }
-      }
-    };
-    return ext.onMessage._dispatch(message, sender, sendResponse);
+      };
+    }
+    return ext.onMessage._dispatch(message, sender, sendResponse).indexOf(true) != -1;
   });
-  //console.log('aaaaa 1');
-  //KITTHACK: no localstorage
-  ext.storage = {}//localStorage;
-  //console.log('localStorage');
+  chrome.runtime.onConnect.addListener(function()
+  {});
+  ext.storage = {
+    get: function(keys, callback)
+    {
+      chrome.storage.local.get(keys, callback);
+    },
+    set: function(key, value, callback)
+    {
+      var items = {};
+      items[key] = value;
+      chrome.storage.local.set(items, callback);
+    },
+    remove: function(key, callback)
+    {
+      chrome.storage.local.remove(key, callback);
+    },
+    onChanged: chrome.storage.onChanged,
+    migratePrefs: function(hooks)
+    {
+      /*
+      var items = {};
+      for (var key in localStorage)
+      {
+        var item = hooks.map(key, localStorage[key]);
+        if (item)
+        {
+          items[item.key] = item.value;
+        }
+      }
+      chrome.storage.local.set(items, function()
+      {
+        localStorage.clear();
+        hooks.done();
+      });*/
+    },
+    migrateFiles: function(callback)
+    {
+      if ("webkitRequestFileSystem" in window)
+      {
+        webkitRequestFileSystem(PERSISTENT, 0, function(fs)
+        {
+          fs.root.getFile("patterns.ini",
+          {}, function(entry)
+          {
+            entry.getMetadata(function(metadata)
+            {
+              entry.file(function(file)
+              {
+                var reader = new FileReader();
+                reader.onloadend = function()
+                {
+                  if (!reader.error)
+                  {
+                    chrome.storage.local.set(
+                    {
+                      "file:patterns.ini": {
+                        content: reader.result.split(/[\r\n]+/),
+                        lastModified: metadata.modificationTime.getTime()
+                      }
+                    }, function()
+                    {
+                      fs.root.createReader().readEntries(function(entries)
+                      {
+                        var emptyFunc = function()
+                        {};
+                        for (var i = 0; i < entries.length; i++)
+                        {
+                          var entry = entries[i];
+                          if (entry.isDirectory)
+                          {
+                            entry.removeRecursively(emptyFunc, emptyFunc);
+                          }
+                          else
+                          {
+                            entry.remove(emptyFunc, emptyFunc);
+                          }
+                        }
+                      });
+                      callback();
+                    });
+                  }
+                  else
+                  {
+                    callback();
+                  }
+                };
+                reader.readAsText(file);
+              }, callback);
+            }, callback);
+          }, callback);
+        }, callback);
+      }
+      else
+      {
+        callback();
+      }
+    }
+  };
+  ext.showOptions = function(callback)
+  {
+    chrome.windows.getLastFocused(function(win)
+    {
+      var optionsUrl = chrome.extension.getURL("options.html");
+      var queryInfo = {
+        url: optionsUrl
+      };
+      if (!win.incognito)
+      {
+        queryInfo.windowId = win.id;
+      }
+      chrome.tabs.query(queryInfo, function(tabs)
+      {
+        if (tabs.length > 0)
+        {
+          var tab = tabs[0];
+          chrome.windows.update(tab.windowId,
+          {
+            focused: true
+          });
+          chrome.tabs.update(tab.id,
+          {
+            active: true
+          });
+          if (callback)
+          {
+            callback(new Page(tab));
+          }
+        }
+        else
+        {
+          ext.pages.open(optionsUrl, callback);
+        }
+      });
+    });
+  };
 })();

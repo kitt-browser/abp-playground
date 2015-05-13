@@ -15,7 +15,7 @@
     "message": "Eigen filters toevoegen"
   },
   "apply_changes": {
-    "message": "Bevestigen"
+    "message": "Wijzigingen toepassen"
   },
   "block_element": {
     "message": "Element blokkeren"
@@ -27,16 +27,13 @@
     "message": "Na het sluiten van deze popup, klik (of klik met de rechtermuisknop) op het pagina-element."
   },
   "description_chrome": {
-    "message": "De gratis adblocker voor Chrome: Blokkeer vervelende video-reclames op YouTube,  advertenties op Facebook, reclame banners en nog v…"
+    "message": "Een gratis adblocker voor Chrome met meer dan 50 miljoen gebruikers, die ALLE vervelende advertenties, malware en tracking blokkeert"
   },
   "description_opera": {
-    "message": "De gratis adblocker voor Opera: Blokkeer vervelende video-reclames op YouTube,  advertenties op Facebook, reclame banners en nog veel meer."
+    "message": "Een gratis adblocker voor Opera met meer dan 50 miljoen gebruikers, die ALLE vervelende advertenties, malware en tracking blokkeert."
   },
   "description_safari": {
-    "message": "De gratis adblocker voor Safari: Blokkeer vervelende video-reclames op YouTube,  advertenties op Facebook, reclame banners en nog veel meer."
-  },
-  "disable_inline": {
-    "message": "Inline tekstadvertenties uitschakelen"
+    "message": "Een gratis adblocker voor Safari met meer dan 50 miljoen gebruikers, die ALLE vervelende advertenties, malware en tracking blokkeert."
   },
   "disabled_for_site": {
     "message": "<strong>Uitgeschakeld</strong> op deze site"
@@ -75,7 +72,7 @@
     "message": "Filterabonnement toevoegen"
   },
   "filters_readMore_label": {
-    "message": "Lees meer"
+    "message": "Meer lezen"
   },
   "filters_subscription_delete_label": {
     "message": "Verwijderen"
@@ -140,6 +137,9 @@
   "firstRun_features": {
     "message": "Adblock Plus kan meer doen dan advertenties blokkeren"
   },
+  "firstRun_filterlistsReinitializedWarning": {
+    "message": "Het lijkt er op dat een probleem was waardoor alle filters verwijderd werden en het onmogelijk was om een backup terug te zetten. Hierdoor hebben we al uw filters en Acceptabele Advertenties instellingen moeten resetten. Controleer A.U.B. uw instellingen in de <a>Adblock Plus Opties</a>."
+  },
   "firstRun_legacySafariWarning": {
     "message": "U gebruikt een oude versie van Safari die niet wordt ondersteund door Adblock Plus. Sommige websites kunnen daardoor onjuist worden weergegeven. Wij raden u aan een update uit te voeren naar Safari versie 6.1.1 of hoger (voor Mac OS X 10.8 Mountain Lion), Safari versie 7.0.1 of hoger (voor Mac OS X 10.9 Mavericks) of de laatste versie van Mozilla Firefox, Google Chrome of Opera te gebruiken."
   },
@@ -171,16 +171,24 @@
     "message": "Geen criteria opgegeven om het te verbergen element te herkennen"
   },
   "global_notification_antiadblock_message": {
-    "message": "Deze website staat er om bekend dat ze berichten laat zien die op Adblock plus gebruikers gericht zijn. Wilt u dat Adblock Plus deze verbergt?"
+    "message": "Deze website staat bekend om het tonen van gerichte berichten aan Adblock Plus-gebruikers. Wilt u dat Adblock Plus deze verbergt?"
   },
   "global_notification_antiadblock_title": {
     "message": "Gerichte berichten verbergen?"
   },
   "global_remove_subscription_warning": {
-    "message": "Weet u zeker dat u dit abonnement wilt verwijderen?"
+    "message": "Wilt u dit abonnement echt verwijderen?"
   },
   "global_subscription_invalid_location": {
-    "message": "Deze filterlijstlocatie is geen geldige URL en ook geen geldige bestandsnaam."
+    "message": "Deze filterlijstlocatie is geen geldige URL, noch een geldige bestandsnaam."
+  },
+  "invalid_css_selector": {
+    "message": "$selector$ is niet een geldige CSS selector",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
   },
   "last_updated_at": {
     "message": "Laatst bijgewerkt op $time$ op $date$",
@@ -201,6 +209,14 @@
       }
     }
   },
+  "line": {
+    "message": "Regel $number$",
+    "placeholders": {
+      "number": {
+        "content": "$1"
+      }
+    }
+  },
   "name": {
     "message": "Adblock Plus"
   },
@@ -211,7 +227,7 @@
     "message": "Klik 'OK' om alle links in het bericht te openen"
   },
   "notification_without_buttons": {
-    "message": "Klik op het bericht om de link te openen"
+    "message": "Klik op de melding om alle links erin te openen."
   },
   "options": {
     "message": "Adblock Plus opties"
@@ -222,11 +238,8 @@
   "out_of_date_lists": {
     "message": "Verouderde lijsten worden regelmatig bijgewerkt."
   },
-  "overlay_hideplaceholders_label": {
-    "message": "Plaatshouders van geblokkeerde elementen verbergen"
-  },
   "overlay_notification_button_close": {
-    "message": "Sluit"
+    "message": "Sluiten"
   },
   "overlay_notification_button_no": {
     "message": "Nee"
@@ -249,7 +262,7 @@
     }
   },
   "stats_label_total": {
-    "message": "<strong>$number$</strong> in totaal.",
+    "message": "<strong>$number$</strong> in totaal",
     "placeholders": {
       "number": {
         "content": "$1"
@@ -292,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Abonnementstitel:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Filter lijst headers zijn niet toegestaan hier"
   },
   "update_now": {
     "message": "Nu bijwerken"

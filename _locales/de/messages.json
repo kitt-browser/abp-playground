@@ -27,16 +27,13 @@
     "message": "Nachdem dieses Fenster geschlossen ist, klicken Sie ein Element auf der Seite an, welches Sie blockieren wollen."
   },
   "description_chrome": {
-    "message": "Der kostenlose Werbeblocker für Chrome: Blockiert nervige Videowerbung auf YouTube, Facebook-Werbung, Werbebanner und vieles mehr."
+    "message": "Ein kostenloser Werbeblocker mit über 50 Mio Nutzern, der ALLE nervenden Werbeanzeigen, Malware- und Tracking-Angriffe blockiert."
   },
   "description_opera": {
-    "message": "Der kostenlose Werbeblocker für Opera: Blockiert nervige Videowerbung auf YouTube, Facebook-Werbung, Werbebanner und vieles mehr."
+    "message": "Ein kostenloser Werbeblocker für Opera mit über 50 Mio Nutzern, der ALLE nervenden Werbeanzeigen, Malware- und Tracking-Angriffe blockiert."
   },
   "description_safari": {
-    "message": "Der kostenlose Werbeblocker für Safari: Blockiert nervige Videowerbung auf YouTube, Facebook-Werbung, Werbebanner und vieles mehr."
-  },
-  "disable_inline": {
-    "message": "Blockiere Inline Text Werbung"
+    "message": "Ein kostenloser Werbeblocker für Safari mit über 50 Mio Nutzern, der ALLE nervenden Werbeanzeigen, Malware- und Tracking-Angriffe blockiert."
   },
   "disabled_for_site": {
     "message": "Auf dieser Seite <strong>deaktiviert</strong>"
@@ -102,7 +99,7 @@
     "message": "Liste öffnen"
   },
   "firstRun_acceptableAdsExplanation": {
-    "message": "Wir möchten Webseiten dazu ermutigen schlichte und unaufdringliche Werbung zu verwenden. Deshalb werden durch <a>strenge Richtlinien</a> akzeptable Werbeanzeigen bestimmt, welche unter Standard-Einstellungen noch angezeigt werden. Wenn Sie jedoch alle Werbungen blockieren möchten, können Sie diese Einstellung in kurzer Zeit <a>deaktivieren</a>."
+    "message": "Wir möchten Webseiten dazu ermutigen schlichte und unaufdringliche Werbung zu verwenden. Deshalb werden durch <a>strenge Richtlinien</a> akzeptable Werbeanzeigen bestimmt, welche unter den Standard-Einstellungen noch angezeigt werden. Wenn Sie jedoch alle Werbungen blockieren möchten, können Sie diese Einstellung in kurzer Zeit <a>deaktivieren</a>."
   },
   "firstRun_acceptableAdsHeadline": {
     "message": "Lästige Werbung wird jetzt blockiert"
@@ -126,13 +123,13 @@
     "message": "Sicheres Surfen durch Blockieren von infizierten Webseiten."
   },
   "firstRun_feature_social": {
-    "message": "Social Media-Buttons entfernen"
+    "message": "Social Media-Knöpfe entfernen"
   },
   "firstRun_feature_social_description": {
     "message": "Entfernt Social-Media-Buttons (z.B. den Facebook-Like) die auf Webseiten erscheinen und Ihr Surfverhalten aufzeichnen."
   },
   "firstRun_feature_tracking": {
-    "message": "Verfolgung ausschalten"
+    "message": "Tracking verhindern"
   },
   "firstRun_feature_tracking_description": {
     "message": "Privates Surfen durch Deaktivierung der Tracker - Versteckt Ihr Surfverhalten vor Werbefirmen, die Sie sonst ausspionieren würden."
@@ -141,10 +138,10 @@
     "message": "Adblock Plus kann mehr als nur Werbung blockieren"
   },
   "firstRun_filterlistsReinitializedWarning": {
-    "message": "Es scheint, als ob aufgrund eines Problems alle Filter entfernt wurden und wir keine Sicherung wiederherstellen konnten. Deshalb wurden alle Ihre Filter sowie Ihre Einstellungen für akzeptable Werbung zurückgesetzt werden. Überprüfen Sie bitte Ihre Filterliste und Ihre Einstellungen für akzeptable Werbung in den <a>Adblock Plus Optionen</a>."
+    "message": "Es scheint, als ob aufgrund eines Problems alle Filter entfernt wurden und wir keine Sicherung wiederherstellen konnten. Deshalb wurden alle Ihre Filter sowie Ihre Einstellungen für akzeptable Werbung zurückgesetzt. Überprüfen Sie bitte Ihre Filterliste und Ihre Einstellungen für akzeptable Werbung in den <a>Adblock Plus Optionen</a>."
   },
   "firstRun_legacySafariWarning": {
-    "message": "Sie verwenden eine ältere Version von Safari, die nicht von Adblock Plus unterstützt wird. Es kann sein, dass Adblock Plus damit nicht richtig funktioniert oder dass bestimmte Websites nicht richtig dargestellt werden. Wir empfehlen deshalb dringend, entweder einen Upgrade auf Safari 6.1.1 oder höher (auf OS X 10.8 Mountain Lion) oder auf Safari 7.0.1 oder höher (auf OS X 10.9 Mavericks) durchzuführen oder die neueste Version von Mozilla Firefox, Google Chrome oder Opera zu verwenden."
+    "message": "Sie verwenden eine ältere Version von Safari, die nicht von Adblock Plus unterstützt wird. Es kann sein, dass Adblock Plus damit nicht richtig funktioniert oder dass bestimmte Websites nicht richtig dargestellt werden. Wir empfehlen deshalb dringend, entweder ein Upgrade auf Safari 6.1.1 oder höher (auf OS X 10.8 Mountain Lion) oder auf Safari 7.0.1 oder höher (auf OS X 10.9 Mavericks) durchzuführen oder die neueste Version von Mozilla Firefox, Google Chrome oder Opera zu verwenden."
   },
   "firstRun_share": {
     "message": "Weiterempfehlen"
@@ -185,6 +182,14 @@
   "global_subscription_invalid_location": {
     "message": "Die eingegebene Adresse ist weder eine gültige Web-Adresse, noch ein gültiger Dateiname."
   },
+  "invalid_css_selector": {
+    "message": "$selector$ ist keine gültige CSS Auswahl",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "Zuletzt aktualisiert: $date$ um $time$",
     "placeholders": {
@@ -200,6 +205,14 @@
     "message": "Zuletzt aktualisiert: heute um $time$",
     "placeholders": {
       "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "line": {
+    "message": "Zeile $number$",
+    "placeholders": {
+      "number": {
         "content": "$1"
       }
     }
@@ -224,9 +237,6 @@
   },
   "out_of_date_lists": {
     "message": "Abgelaufene Filterlisten werden regelmäßig aktualisiert."
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "Platzhalter blockierter Elemente verstecken"
   },
   "overlay_notification_button_close": {
     "message": "Schließen"
@@ -282,7 +292,7 @@
     "message": "Diese Statistiken teilen"
   },
   "stats_show_iconnumber": {
-    "message": "Anzahl im Symbol anzeigen"
+    "message": "Anzahl im Icon anzeigen"
   },
   "stats_title": {
     "message": "Blockierte Werbeanzeigen"
@@ -295,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Bezeichnung des Abonnements:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Filterlisten-Header sind hier nicht erlaubt"
   },
   "update_now": {
     "message": "Jetzt aktualisieren"

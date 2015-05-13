@@ -1,6 +1,6 @@
 /*
- * This file is part of Adblock Plus <http://adblockplus.org/>,
- * Copyright (C) 2006-2014 Eyeo GmbH
+ * This file is part of Adblock Plus <https://adblockplus.org/>,
+ * Copyright (C) 2006-2015 Eyeo GmbH
  *
  * Adblock Plus is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -20,7 +20,6 @@ function init()
   // Attach event listeners
   window.addEventListener("keydown", onKeyDown, false);
   window.addEventListener("dragstart", onDragStart, false);
-  window.addEventListener("drag", onDrag, false);
   window.addEventListener("dragend", onDragEnd, false);
 
   $("#addButton").click(addFilters);
@@ -32,6 +31,7 @@ function init()
   ext.backgroundPage.sendMessage(
   {
     type: "forward",
+    expectsResponse: true,
     payload:
     {
       type: "clickhide-init",
@@ -64,12 +64,20 @@ function onKeyDown(event)
 
 function addFilters()
 {
-  // Tell the background page to add the filters
-  var filters = document.getElementById("filters").value.split(/[\r\n]+/)
-                        .map(function(f) {return f.replace(/^\s+/, "").replace(/\s+$/, "");})
-                        .filter(function(f) {return f != "";});
-  ext.backgroundPage.sendMessage({type: "add-filters", filters: filters});
-  closeDialog(true);
+  ext.backgroundPage.sendMessage(
+    {
+      type: "add-filters",
+      text: document.getElementById("filters").value
+    },
+
+    function(response)
+    {
+      if (response.status == "ok")
+        closeDialog(true);
+      else
+        alert(response.error);
+    }
+  );
 }
 
 function closeDialog(success)
@@ -86,40 +94,59 @@ function closeDialog(success)
   );
 }
 
-var dragCoords = null;
+var dragStartX;
+var dragStartY;
+var dragEndX = null;
+var dragEndY = null;
+
 function onDragStart(event)
 {
-  dragCoords = [event.screenX, event.screenY];
-}
-
-function onDrag(event)
-{
-  if (!dragCoords)
-    return;
-
-  if (!event.screenX && !event.screenY)
-    return;
-
-  var diff = [event.screenX - dragCoords[0], event.screenY - dragCoords[1]];
-  if (diff[0] || diff[1])
+  var element = document.elementFromPoint(event.clientX, event.clientY);
+  if (element && element.localName == "textarea")
   {
-    ext.backgroundPage.sendMessage(
-      {
-        type: "forward",
-        payload:
-        {
-          type: "clickhide-move",
-          x: diff[0],
-          y: diff[1]
-        }
-      }
-    );
-    dragCoords = [event.screenX, event.screenY];
+    // Don't drag the dialog when the user has clicked into the textarea.
+    // Most likely the user just wants to focus it or select text there.
+    event.preventDefault();
+  }
+  else
+  {
+    dragStartX = event.screenX;
+    dragStartY = event.screenY;
   }
 }
 
 function onDragEnd(event)
 {
-  onDrag(event);
-  dragCoords = null;
+  if (dragEndX == null)
+    dragEndX = event.screenX;
+  if (dragEndY == null)
+    dragEndY = event.screenY;
+
+  ext.backgroundPage.sendMessage({
+    type: "forward",
+    payload:
+    {
+      type: "clickhide-move",
+      x: dragEndX - dragStartX,
+      y: dragEndY - dragStartY
+    }
+  });
+
+  dragStartX = null;
+  dragStartY = null;
+  dragEndX = null;
+  dragEndY = null;
+}
+
+// The coordinates in the dragend event are unreliable on Safari. So we
+// need to get the destination coordinates from the drag event instead.
+// However on Chrome, the coordinates in the drag event are unreliable.
+// So we need to get the coordinates from dragend event there.
+if (navigator.userAgent.indexOf(" Version/") != -1)
+{
+  window.addEventListener("drag", function(event)
+  {
+    dragEndX = event.screenX;
+    dragEndY = event.screenY;
+  }, false);
 }

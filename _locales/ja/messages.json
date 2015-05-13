@@ -27,16 +27,13 @@
     "message": "このポップアップが閉じた後にページ上の要素をクリック(または右クリック)してください。"
   },
   "description_chrome": {
-    "message": "無料の Chrome 用広告ブロックツール: 迷惑な YouTube のビデオ広告、Facebook 広告、バナー広告等をブロックします"
+    "message": "5,000万人以上に利用されている、Chrome 用の無料の広告ブロッカーです。目障りな広告、マルウェア、行動追跡を根こそぎブロックします。"
   },
   "description_opera": {
-    "message": "無料の Opera 用広告ブロックツール: 迷惑な YouTube のビデオ広告、Facebook 広告、バナー広告等をブロックします"
+    "message": "5,000万人以上に利用されている、Opera 用の無料の広告ブロッカーです。目障りな広告、マルウェア、行動追跡を根こそぎブロックします。"
   },
   "description_safari": {
-    "message": "無料の Safari 用広告ブロックツール: 迷惑な YouTube のビデオ広告、Facebook 広告、バナー広告等をブロックします"
-  },
-  "disable_inline": {
-    "message": "インラインテキスト広告を無効にする"
+    "message": "5,000万人以上に利用されている、Safari 用の無料の広告ブロッカーです。目障りな広告、マルウェア、行動追跡を根こそぎブロックします。"
   },
   "disabled_for_site": {
     "message": "このサイトで<strong>無効</strong>"
@@ -185,6 +182,14 @@
   "global_subscription_invalid_location": {
     "message": "購読するフィルタの URL が無効、もしくは不正なファイル名です。"
   },
+  "invalid_css_selector": {
+    "message": "$selector$ は有効な CSS セレクタではありません",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "最終更新日 $date$ $time$",
     "placeholders": {
@@ -204,6 +209,14 @@
       }
     }
   },
+  "line": {
+    "message": "$number$ 行目",
+    "placeholders": {
+      "number": {
+        "content": "$1"
+      }
+    }
+  },
   "name": {
     "message": "Adblock Plus"
   },
@@ -211,7 +224,7 @@
     "message": "Adblock Plus 開発版"
   },
   "notification_with_buttons": {
-    "message": "この通知内すべてのリンクを開くには 'OK' をクリックしてください。"
+    "message": "この通知のすべてのリンクを開くには [OK] をクリックしてください。"
   },
   "notification_without_buttons": {
     "message": "通知内すべてのリンクを開くにはここをクリックしてください。"
@@ -224,9 +237,6 @@
   },
   "out_of_date_lists": {
     "message": "リストは定期的に更新されます。"
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "ブロックした場所に残る空きスペースを詰める"
   },
   "overlay_notification_button_close": {
     "message": "閉じる"
@@ -295,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "購読するフィルタの名称:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "ここにフィルタのヘッダーを記述することはできません"
   },
   "update_now": {
     "message": "今すぐ更新"

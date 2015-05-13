@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 
 <!--
-  - This file is part of Adblock Plus <http://adblockplus.org/>,
-  - Copyright (C) 2006-2014 Eyeo GmbH
+  - This file is part of Adblock Plus <https://adblockplus.org/>,
+  - Copyright (C) 2006-2015 Eyeo GmbH
   -
   - Adblock Plus is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License version 3 as
@@ -29,11 +29,14 @@
 <script type="text/javascript" src="i18n.js" charset="utf-8"></script>
 <script type="text/javascript" src="block.js" charset="utf-8"></script>
 <style type="text/css">
+  html, body              /* The background color of the <html> and <body> */
+  {                       /* element must be set. Otherwise Safari renders */
+    background: #ffffff;  /* the frame transparent while it is dragged.    */
+  }
   body
   {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;
-    background: #ffffff;
     margin: 0px;
     padding: 5px;
     display: inline-block;
@@ -56,6 +59,8 @@
     width: 400px;
     height: 100px;
     resize: none;
+    white-space: pre;
+    word-wrap: normal;
   }
   #buttons
   {
@@ -70,7 +75,7 @@
 <body draggable="true">
 
 <div id="title">
-  <img src="icons/abp-32.png" />
+  <img src="icons/detailed/abp-32.png" srcset="icons/detailed/abp-64.png 2x">
   <span class="i18n_add_filters_msg"></span>
 </div>
 

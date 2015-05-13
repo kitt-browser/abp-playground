@@ -1,6 +1,6 @@
 /*
- * This file is part of Adblock Plus <http://adblockplus.org/>,
- * Copyright (C) 2006-2014 Eyeo GmbH
+ * This file is part of Adblock Plus <https://adblockplus.org/>,
+ * Copyright (C) 2006-2015 Eyeo GmbH
  *
  * Adblock Plus is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -14,12 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-//This case is true only for chrome when loading from notification.html
-if (typeof ext === "undefined")
-{
-  var ext = chrome.extension.getBackgroundPage().ext;
-}
 
 var backgroundPage = ext.backgroundPage.getWindow();
 var require = backgroundPage.require;

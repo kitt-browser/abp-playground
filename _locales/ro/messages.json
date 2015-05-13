@@ -9,7 +9,7 @@
     "message": "Adaugă filtru"
   },
   "add_filters_msg": {
-    "message": "Adaugă filtre?"
+    "message": "Adaugă filtru/filtre?"
   },
   "add_your_own_filters": {
     "message": "Adaugă propriile filtre"
@@ -18,7 +18,7 @@
     "message": "Aplică modificările"
   },
   "block_element": {
-    "message": "Blochează Elementul"
+    "message": "Blochează elementul"
   },
   "cancel": {
     "message": "Anulează"
@@ -27,16 +27,13 @@
     "message": "După închiderea acestui pop-up, clic (sau clic-dreapta) pe un element de pe pagină."
   },
   "description_chrome": {
-    "message": "Adblock Plus pentru Chrome: instrument gratuit care blocheaza agasantele reclame video pe YouTube, reclamele Facebook, banere si mu…"
+    "message": "Extensie gratuită pentru Chrome, folosită de peste 50 milioane de persoane, blochează TOATE reclamele enervante,malware şi tracking."
   },
   "description_opera": {
-    "message": "Adblock Plus pentru Opera: instrument gratuit care blocheaza agasantele reclame video pe YouTube, reclamele Facebook, banere si multe altele."
+    "message": "Extensie gratuită pentru Opera, folosită de peste 50 milioane de persoane, blochează TOATE reclamele enervante, malware şi tracking."
   },
   "description_safari": {
-    "message": "Adblock Plus pentru Safari: instrument gratuit care blocheaza agasantele reclame video pe YouTube, reclamele Facebook, banere si multe altele."
-  },
-  "disable_inline": {
-    "message": "Dezactivează inserturile publicitare de tip text"
+    "message": "Extensie gratuită pentru Safari, folosită de peste 50 milioane de persoane, blochează TOATE reclamele enervante, malware şi tracking."
   },
   "disabled_for_site": {
     "message": "<strong>Dezactivat</strong> pe acest site"
@@ -48,7 +45,7 @@
     "message": "Blochează elementul"
   },
   "edit_filters_raw": {
-    "message": "Editor filtre în mod text"
+    "message": "Editează filtre în mod text"
   },
   "enable_only_the": {
     "message": "Folosiţi doar listele de filtre de care aveţi nevoie. Prea multe vor afecta browser-ul."
@@ -185,6 +182,14 @@
   "global_subscription_invalid_location": {
     "message": "Locaţia pentru filtre nu este validă"
   },
+  "invalid_css_selector": {
+    "message": "$selector$ nu este un selector de CSS valid",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "Ultima actualizare la ora $time$ pe data $date$",
     "placeholders": {
@@ -200,6 +205,14 @@
     "message": "Ultima actualizare la ora $time$ azi",
     "placeholders": {
       "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "line": {
+    "message": "Linie $number$",
+    "placeholders": {
+      "number": {
         "content": "$1"
       }
     }
@@ -225,9 +238,6 @@
   "out_of_date_lists": {
     "message": "Listele vechi sunt actualizate periodic."
   },
-  "overlay_hideplaceholders_label": {
-    "message": "Ascunde indicatoarele elementelor blocate"
-  },
   "overlay_notification_button_close": {
     "message": "Închide"
   },
@@ -238,7 +248,7 @@
     "message": "Da"
   },
   "remove_button": {
-    "message": "Șterge filtrul evidenţiat"
+    "message": "Elimină selecţia"
   },
   "show_block_element_menu": {
     "message": "Arată 'Blochează Elementul' in meniul asociat unui obiect cu clic dreapta"
@@ -268,10 +278,10 @@
     }
   },
   "stats_share_download": {
-    "message": "Descarca Adblock Plus"
+    "message": "Descarcă Adblock Plus"
   },
   "stats_share_message": {
-    "message": "Am blocat $number$ reclame cu ABP.",
+    "message": "Am blocat $number$ reclame si trackere datorita lui Adblock Plus.",
     "placeholders": {
       "number": {
         "content": "$1"
@@ -295,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Titlul abonamentului:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Antetul listei de filtre nu este permis aici"
   },
   "update_now": {
     "message": "Actualizează acum"

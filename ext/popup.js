@@ -1,8 +1,21 @@
-window.ext = {
-  __proto__: chrome.extension.getBackgroundPage().ext,
+(function()
+{
+  var backgroundPage = chrome.extension.getBackgroundPage();
+  window.ext = Object.create(backgroundPage.ext);
 
-  closePopup: function()
+  ext.closePopup = function()
   {
     window.close();
-  }
-};
+  };
+
+  // We have to override ext.backgroundPage, because in order
+  // to send messages the local "chrome" namespace must be used.
+  ext.backgroundPage = {
+    sendMessage: chrome.runtime.sendMessage,
+
+    getWindow: function()
+    {
+      return backgroundPage;
+    }
+  };
+})();

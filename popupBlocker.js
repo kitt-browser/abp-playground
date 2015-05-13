@@ -1,6 +1,6 @@
 /*
- * This file is part of Adblock Plus <http://adblockplus.org/>,
- * Copyright (C) 2006-2014 Eyeo GmbH
+ * This file is part of Adblock Plus <https://adblockplus.org/>,
+ * Copyright (C) 2006-2015 Eyeo GmbH
  *
  * Adblock Plus is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -27,20 +27,15 @@ if (require("info").platform == "chromium")
     if (!sourceFrame || isFrameWhitelisted(sourcePage, sourceFrame))
       return;
 
-    var openerUrl = sourceFrame.url;
-    if (!openerUrl)
-    {
-      // We don't know the opener tab
+    var documentHost = extractHostFromFrame(sourceFrame);
+    if (!documentHost)
       return;
-    }
-    tabsLoading[details.tabId] = openerUrl;
 
-    checkPotentialPopup(details.tabId, details.url, openerUrl);
+    tabsLoading[details.tabId] = documentHost;
+    checkPotentialPopup(details.tabId, details.url, documentHost);
   });
 
-  console.log('popupBlocker before tabs.onUpdated');
-
-  /*chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
+  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
   {
     if (!(tabId in tabsLoading))
     {
@@ -53,15 +48,18 @@ if (require("info").platform == "chromium")
 
     if ("status" in changeInfo && changeInfo.status == "complete" && tab.url != "about:blank")
       delete tabsLoading[tabId];
-  });*/
+  });
 }
 
-function checkPotentialPopup(tabId, url, opener)
+function checkPotentialPopup(tabId, url, documentHost)
 {
-  var requestHost = extractHostFromURL(url);
-  var documentHost = extractHostFromURL(opener);
-  var thirdParty = isThirdParty(requestHost, documentHost);
-  var filter = defaultMatcher.matchesAny(url || "about:blank", "POPUP", documentHost, thirdParty);
+  url = new URL(url || "about:blank");
+
+  var filter = defaultMatcher.matchesAny(
+    stringifyURL(url), "POPUP",
+    documentHost, isThirdParty(url, documentHost)
+  );
+
   if (filter instanceof BlockingFilter)
     chrome.tabs.remove(tabId);
 }

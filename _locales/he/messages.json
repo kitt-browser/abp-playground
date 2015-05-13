@@ -24,19 +24,16 @@
     "message": "ביטול"
   },
   "clickhide_instructions": {
-    "message": "לאחר סגירת חלונית זו, יש ללחוץ (לא משנה באיזה לחצן) על רכיב בעמוד זה."
+    "message": "לאחר סגירת חלון זה, לחצו (אפשרי לחיצה-ימנית) על רכיב בעמוד זה."
   },
   "description_chrome": {
-    "message": "כלי חסימת הפרסומות החינמי עבור Chrome: חסימת מודעות וידאו מטרידות ב-YouTube, מודעות Facebook , באנרים ועוד רבות."
+    "message": "בשימוש על ידי יותר מ-50 מיליון אנשים, חוסם מודעות חינמי עבור כרום שחוסם את כל הפרסומות המעצבנות, התוכנות הזדוניות ותוכנות המעקב."
   },
   "description_opera": {
-    "message": "כלי חסימת הפרסומות החינמי עבור Opera: חסימת מודעות וידאו מטרידות ב-YouTube, מודעות Facebook , באנרים ועוד רבות."
+    "message": "בשימוש על ידי יותר מ-50 מיליון אנשים, חוסם מודעות חינמי עבור אופרה שחוסם את כל הפרסומות המעצבנות, התוכנות הזדוניות ותוכנות המעקב."
   },
   "description_safari": {
-    "message": "כלי חסימת הפרסומות החינמי עבור Safari: חסימת מודעות וידאו מטרידות ב-YouTube, מודעות Facebook , באנרים ועוד רבות."
-  },
-  "disable_inline": {
-    "message": "ניטרול מודעות טקסט"
+    "message": "בשימוש על ידי יותר מ-50 מיליון אנשים, חוסם מודעות חינמי עבור ספארי שחוסם את כל הפרסומות המעצבנות, התוכנות הזדוניות ותוכנות המעקב."
   },
   "disabled_for_site": {
     "message": "<strong>מנוטרל</strong> באתר זה"
@@ -140,6 +137,9 @@
   "firstRun_features": {
     "message": "Adblock Plus יכול לעשות יותר מרק לחסום פרסומות"
   },
+  "firstRun_filterlistsReinitializedWarning": {
+    "message": "נראה שישנה בעיה שגרמה לכל המסננים להימחק ולא היה ביכולתנו לגבות אותם. לכן נאלצנו לאפס את המסננים ואת הגדרות המודעות המקובלות. נא בדקו את רשימת המסננים והגדרות המודעות המקובלות ב <a>Adblock Plus אפשרויות</a>."
+  },
   "firstRun_legacySafariWarning": {
     "message": "הנכם משתמשים בגירסה ישנה של Safari שלא נתמכת על ידי Adblock Plus. זה עלול לא לעבוד כראוי או לשבש את חווית המשתמש בחלק מהאתרים. אנו ממליצים לכם לעדכן את Safari לגרסה 6.1.1 ומעלה (OS X 10.8 Mountain Lion) או Safari 7.0.1 ומעלה (OS X 10.9 Mavericks) או להשתמש בגרסה האחרונה של Mozilla Firefox, Google Chrome or Opera."
   },
@@ -182,6 +182,14 @@
   "global_subscription_invalid_location": {
     "message": "מיקום רשימת הסינון איננו כתובת אתר חוקית ולא שם קובץ חוקי."
   },
+  "invalid_css_selector": {
+    "message": "$selector$ איננו בורר CSS תקף",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "עודכנה לאחרונה בשעה $time$ ב־$date$",
     "placeholders": {
@@ -197,6 +205,14 @@
     "message": "עודכנה לאחרונה בשעה $time$ ב־היום",
     "placeholders": {
       "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "line": {
+    "message": "שורה $number$",
+    "placeholders": {
+      "number": {
         "content": "$1"
       }
     }
@@ -221,9 +237,6 @@
   },
   "out_of_date_lists": {
     "message": "רשימות שאינן עדכניות מתעדכנות באופן תדיר."
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "הסתרת מצייני מקום של אלמנטים חסומים"
   },
   "overlay_notification_button_close": {
     "message": "סגירה"
@@ -292,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "כותרת ההרשמה:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "כותרות סינון רשימה אינן מותרות כאן"
   },
   "update_now": {
     "message": "עדכן כעת"

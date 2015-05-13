@@ -18,7 +18,7 @@
     "message": "Rakenda muudatused"
   },
   "block_element": {
-    "message": "Blokeeri Element"
+    "message": "Blokeeri element"
   },
   "cancel": {
     "message": "Loobu"
@@ -27,25 +27,22 @@
     "message": "Pärast sulgemist hüpikaken, klõpsake (või paremklõps) element lehel."
   },
   "description_chrome": {
-    "message": "Tasuta adblock vahend Chrome: Ploki tüütu video YouTube'is reklaame Facebook reklaame, plakatid ja palju muud."
+    "message": "Kasutab üle 50 miljoni inimese, tasuta reklaami blokeerija Chrome, mis blokeerib KÕIK tüütuid reklaame, pahavara ja jälgimist."
   },
   "description_opera": {
-    "message": "Tasuta adblock vahend Opera: Ploki tüütu video YouTube'is reklaame Facebook reklaame, plakatid ja palju muud."
+    "message": "Kasutab üle 50 miljoni inimese, tasuta reklaami blokeerija Opera mis blokeerib kõik tüütuid reklaame, pahavara ja jälgimist."
   },
   "description_safari": {
-    "message": "Tasuta adblock vahend Safari: Ploki tüütu video YouTube'is reklaame Facebook reklaame, plakatid ja palju muud."
-  },
-  "disable_inline": {
-    "message": "Keela inline tekst reklaame"
+    "message": "Kasutab üle 50 miljoni inimese, tasuta reklaami blokeerija Safari, mis blokeerib kõik tüütuid reklaame, pahavara ja jälgimist."
   },
   "disabled_for_site": {
     "message": "<strong>Puuetega</strong> sellel saidil"
   },
   "disabled_for_these_domains": {
-    "message": "AdBlock Plus on keelatud valdkondades, valesti on loetletud allpool. Saate lisada domeeni kas vahendusel AdBlock Plus aadressiribal ikooni VÕI kirjutades domeeni (Mitte URL) lahtrisse JA klõpsa \"Lisa domeen\" Nuppu."
+    "message": "Adblock Plus on keelatud valdkondades, valesti on loetletud allpool. Saate lisada domeeni kas vahendusel Adblock Plus aadressiribal ikooni VÕI kirjutades domeeni (Mitte URL) lahtrisse JA klõpsa \"Lisa domeen\" Nuppu."
   },
   "easy_create_filter": {
-    "message": "Block element"
+    "message": "Blokeeri element"
   },
   "edit_filters_raw": {
     "message": "Edit filtrid tekstigfail"
@@ -101,8 +98,14 @@
   "filters_viewList_label": {
     "message": "Vaata loetelu"
   },
+  "firstRun_acceptableAdsExplanation": {
+    "message": "Sooviksime julgustada veebilehti kasutama otsekoheseid, mittehäirivaid reklaame. Sellepärast on meil <a>ranged eeskirjad</a>, et tuvastada lubatavaid reklaame, mida kuvatakse vaikimise sätete all. Kui sa ikka soovid kõik reklaamid blokeerida, saad sa selle paari sekundi pärast <a>välja lülitada</a>."
+  },
   "firstRun_acceptableAdsHeadline": {
     "message": "Tüütud kuulutused on nüüd blokeeritud"
+  },
+  "firstRun_dataCorruptionWarning": {
+    "message": "Kas see leht ilmub ikka? <a>Kliki siia!</a>"
   },
   "firstRun_donate": {
     "message": "anneta"
@@ -113,11 +116,20 @@
   "firstRun_feature_malware": {
     "message": "Viiruste blokeerimine"
   },
+  "firstRun_feature_malware_description": {
+    "message": "Tehke veebis surfamine turvalisemaks tuntud pahavara domeeninimede blokeerimisega."
+  },
   "firstRun_feature_social": {
     "message": "Eemalde sotsiaalse meedia nuppe"
   },
   "firstRun_feature_tracking": {
     "message": "Keela Jälgimine"
+  },
+  "firstRun_features": {
+    "message": "Adblock Plus suudab teha enamat, kui reklaame blokeerida"
+  },
+  "firstRun_legacySafariWarning": {
+    "message": "Te kasutate vana Safari versiooni, mida Adblock Plus ei toeta. Adblock Plus ei pruugi korralikult töötada ning võib mõnedel lehekülgedel kasutaja kogemust halvendada. Me soovitame tungivalt uuendada Safarit versioonile 6.1.1 või uuemale (OS X 10.8 Mountain Lion operatsioonisüsteemi puhul), versioonile 7.0.1 või uuemale (OS X 10.9 operatsioonisüsteemi puhul) või kasutada järgmiste veebilehitsejate värskemaid versioone: Mozilla Firefox, Google Chrome, Opera."
   },
   "firstRun_share": {
     "message": "Räägi oma sõpradele"
@@ -152,6 +164,14 @@
   "global_subscription_invalid_location": {
     "message": "Filtrite nimekirja asukoht on kas vigane URL või failinimi."
   },
+  "invalid_css_selector": {
+    "message": "$selector$ ei ole kehtiv CSS valija",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "Viimati uuendatud: $time$ on $date$",
     "placeholders": {
@@ -171,11 +191,25 @@
       }
     }
   },
+  "line": {
+    "message": "Rida $number$",
+    "placeholders": {
+      "number": {
+        "content": "$1"
+      }
+    }
+  },
   "name": {
     "message": "Adblock Plus"
   },
   "name_devbuild": {
     "message": "Adblock Plus arendusväljalase"
+  },
+  "notification_with_buttons": {
+    "message": "Cliquez sur « OK » pour ouvrir tous les liens de cette notification."
+  },
+  "notification_without_buttons": {
+    "message": "Cliquez sur la notification pour ouvrir tous les liens qu'elle contient."
   },
   "options": {
     "message": "AdBlock Plus Valikud"
@@ -185,9 +219,6 @@
   },
   "out_of_date_lists": {
     "message": "Out-of-date nimekirjad uuendatakse perioodiliselt."
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "Peida blokeeritud elementide kohatäitjad"
   },
   "remove_button": {
     "message": "Eemalda valitud"
@@ -220,7 +251,7 @@
     }
   },
   "stats_share_download": {
-    "message": "Lae AdBlock Plus"
+    "message": "Lae Adblock Plus"
   },
   "stats_share_message": {
     "message": "Ma blokeeritud $number$ reklaamid ja jälgimisseadmed tänu Adblock Plus.",
@@ -247,6 +278,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Tellimuse pealkiri:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Filtrite loetelu päised pole siin lubatud"
   },
   "update_now": {
     "message": "Värskenda kohe"

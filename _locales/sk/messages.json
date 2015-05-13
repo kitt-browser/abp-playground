@@ -27,16 +27,13 @@
     "message": "Po zatvorení tohto okna, kliknite (alebo kliknite pravým tlačidlom myši) na prvok na stránke."
   },
   "description_chrome": {
-    "message": "Bezplatný blokovač reklamy pre Chrome: Blokuje otravné videoreklamy na YouTube, Facebook reklamy, banery a omnoho viac."
+    "message": "Používa viac ako 50 miliónov ľudí. Zadarmo blokuje VŠETKY obťažujúce reklamy, malware a sledovanie."
   },
   "description_opera": {
-    "message": "Bezplatný blokovač reklamy pre Operu: Blokuje otravné videoreklamy na YouTube, Facebook reklamy, banery a omnoho viac."
+    "message": "Používa viac ako 50 miliónov ľudí. Zadarmo blokuje VŠETKY obťažujúce reklamy, malware a sledovanie."
   },
   "description_safari": {
-    "message": "Bezplatný blokovač reklamy pre Safari: Blokuje otravné videoreklamy na YouTube, Facebook reklamy, banery a omnoho viac."
-  },
-  "disable_inline": {
-    "message": "Vypnutie vnútroriadkových textových reklám"
+    "message": "Používa viac ako 50 miliónov ľudí. Zadarmo blokuje VŠETKY obťažujúce reklamy, malware a sledovanie."
   },
   "disabled_for_site": {
     "message": "<strong>Zakázané</strong> na tejto stránke"
@@ -185,6 +182,14 @@
   "global_subscription_invalid_location": {
     "message": "Umiestnenie zoznamu filtrov nemá platnú URL alebo platný názov súboru."
   },
+  "invalid_css_selector": {
+    "message": "$selector$ nie je platný CSS identifikátor",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
   "last_updated_at": {
     "message": "Posledná aktualizácia nastala o $time$, $date$",
     "placeholders": {
@@ -204,8 +209,25 @@
       }
     }
   },
+  "line": {
+    "message": "Riadok $number$",
+    "placeholders": {
+      "number": {
+        "content": "$1"
+      }
+    }
+  },
   "name": {
     "message": "Adblock Plus"
+  },
+  "name_devbuild": {
+    "message": "Vývojová verzia Adblock Plus"
+  },
+  "notification_with_buttons": {
+    "message": "Stlačte 'OK' pre otvorenie všetkých odkazov v tomto upozornení."
+  },
+  "notification_without_buttons": {
+    "message": "Kliknite na upozornenie pre otvorenie všetkých odkazov v ňom."
   },
   "options": {
     "message": "Adblock Plus nastavenia"
@@ -215,9 +237,6 @@
   },
   "out_of_date_lists": {
     "message": "Zastarané zoznamy sú pravidelne aktualizované."
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "Skryť symboly blokovaných prvkov"
   },
   "overlay_notification_button_close": {
     "message": "Zatvoriť"
@@ -232,7 +251,7 @@
     "message": "Odstrániť vybrané"
   },
   "show_block_element_menu": {
-    "message": "Zobraziť zablokovaný prvok kliknutím na položku pravým tlačidlom"
+    "message": "Zobrazovať v kontextovom menu položku blokovania prvkov"
   },
   "stats_label_page": {
     "message": "<strong>$number$</strong> na tejto stránke",
@@ -286,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Názov povolenia:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Hlavičky filtra nie sú povolené"
   },
   "update_now": {
     "message": "Aktualizovať teraz"

@@ -1,6 +1,6 @@
 /*
- * This file is part of Adblock Plus <http://adblockplus.org/>,
- * Copyright (C) 2006-2014 Eyeo GmbH
+ * This file is part of Adblock Plus <https://adblockplus.org/>,
+ * Copyright (C) 2006-2015 Eyeo GmbH
  *
  * Adblock Plus is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -16,14 +16,13 @@
  */
 
 var backgroundPage = ext.backgroundPage.getWindow();
-var imports = ["require", "extractHostFromURL", "openOptions"];
-for (var i = 0; i < imports.length; i++)
-  window[imports[i]] = backgroundPage[imports[i]];
+var require = backgroundPage.require;
 
 var Filter = require("filterClasses").Filter;
 var FilterStorage = require("filterStorage").FilterStorage;
 var Prefs = require("prefs").Prefs;
-var isWhitelisted = require("whitelisting").isWhitelisted;
+var isPageWhitelisted = require("whitelisting").isPageWhitelisted;
+var getDecodedHostname = require("url").getDecodedHostname;
 
 var page = null;
 
@@ -33,9 +32,12 @@ function init()
   {
     page = pages[0];
 
-    // Mark page as local to hide non-relevant elements
-    if (!page || !/^https?:\/\//.test(page.url))
+    // Mark page as 'local' or 'nohtml' to hide non-relevant elements
+    if (!page || (page.url.protocol != "http:" &&
+                  page.url.protocol != "https:"))
       document.body.classList.add("local");
+    else if (!backgroundPage.htmlPages.has(page))
+      document.body.classList.add("nohtml");
 
     // Ask content script whether clickhide is active. If so, show cancel button.
     // If that isn't the case, ask background.html whether it has cached filters. If so,
@@ -43,8 +45,8 @@ function init()
     // Otherwise, we are in default state.
     if (page)
     {
-      if (isWhitelisted(page.url))
-        document.getElementById("enabled").classList.add("off");
+      if (isPageWhitelisted(page))
+        document.body.classList.add("disabled");
 
       page.sendMessage({type: "get-clickhide-state"}, function(response)
       {
@@ -60,7 +62,7 @@ function init()
   document.getElementById("clickhide-cancel").addEventListener("click", cancelClickHide, false);
   document.getElementById("options").addEventListener("click", function()
   {
-    openOptions();
+    ext.showOptions();
   }, false);
 
   // Set up collapsing of menu items
@@ -77,11 +79,10 @@ window.addEventListener("DOMContentLoaded", init, false);
 
 function toggleEnabled()
 {
-  var enabledButton = document.getElementById("enabled")
-  var disabled = enabledButton.classList.toggle("off");
+  var disabled = document.body.classList.toggle("disabled");
   if (disabled)
   {
-    var host = extractHostFromURL(page.url).replace(/^www\./, "");
+    var host = getDecodedHostname(page.url).replace(/^www\./, "");
     var filter = Filter.fromText("@@||" + host + "^$document");
     if (filter.subscriptions.length && filter.disabled)
       filter.disabled = false;
@@ -94,13 +95,13 @@ function toggleEnabled()
   else
   {
     // Remove any exception rules applying to this URL
-    var filter = isWhitelisted(page.url);
+    var filter = isPageWhitelisted(page);
     while (filter)
     {
       FilterStorage.removeFilter(filter);
       if (filter.subscriptions.length)
         filter.disabled = true;
-      filter = isWhitelisted(page.url);
+      filter = isPageWhitelisted(page);
     }
   }
 }

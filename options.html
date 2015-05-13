@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 
 <!--
-  - This file is part of Adblock Plus <http://adblockplus.org/>,
-  - Copyright (C) 2006-2014 Eyeo GmbH
+  - This file is part of Adblock Plus <https://adblockplus.org/>,
+  - Copyright (C) 2006-2015 Eyeo GmbH
   -
   - Adblock Plus is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License version 3 as
@@ -134,8 +134,8 @@ button
 <body>
 <table>
   <tr>
-    <td style="padding-right: 8px">
-      <img src="icons/abp-32.png">
+    <td style="padding-right: 8px; vertical-align: middle;">
+      <img src="icons/detailed/abp-32.png" srcset="icons/detailed/abp-64.png 2x">
     </td>
     <td>
       <h1><span class="i18n_options"></span></h1>
@@ -162,9 +162,9 @@ button
       <!-- Subscription entry template -->
       <div id="subscriptionTemplate" class="subscription">
         <button class="i18n_filters_subscription_delete_label subscriptionRemoveButton"></button>
-        <span class="subscriptionEnabledContainer">
+        <label class="subscriptionEnabledContainer">
           <input class="subscriptionEnabled" type="checkbox" /> <span class="i18n_filters_subscription_enabled_label"></span>
-        </span>
+        </label>
         <a class="subscriptionTitle"></a>
         <span class="subscriptionUpdate"></span>
       </div>
@@ -197,7 +197,7 @@ button
 
       <div id="acceptableAdsContainer">
         <input type="checkbox" id="acceptableAds" />
-        <span class="i18n_filters_acceptableAds2_label"></span>
+        <label for="acceptableAds" class="i18n_filters_acceptableAds2_label"></label>
         <a id="acceptableAdsLink" href="#" target="_blank" class="i18n_filters_viewList_label"></a>
         <a id="acceptableAdsDocs" href="#" target="_blank" class="i18n_filters_readMore_label"></a>
       </div>
@@ -273,10 +273,7 @@ button
   <div id="tab-general">
     <p>
       <div id="shouldShowBlockElementMenuContainer">
-        <input type="checkbox" id="shouldShowBlockElementMenu" /><span class="i18n_show_block_element_menu"></span>
-      </div>
-      <div id="hidePlaceholdersContainer">
-        <input type="checkbox" id="hidePlaceholders" /><span class="i18n_overlay_hideplaceholders_label"></span>
+        <input type="checkbox" id="shouldShowBlockElementMenu" /><label for="shouldShowBlockElementMenu" class="i18n_show_block_element_menu"></label>
       </div>
     </p>
 

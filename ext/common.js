@@ -23,10 +23,9 @@
 (function()
 {
   window.ext = {};
-  var EventTarget = ext._EventTarget = function(cancelable)
+  var EventTarget = ext._EventTarget = function()
   {
     this._listeners = [];
-    this._cancelable = cancelable;
   };
   EventTarget.prototype = {
     addListener: function(listener)
@@ -46,16 +45,12 @@
     },
     _dispatch: function()
     {
-      var result = null;
+      var results = [];
       for (var i = 0; i < this._listeners.length; i++)
       {
-        result = this._listeners[i].apply(null, arguments);
-        if (this._cancelable && result === false)
-        {
-          break;
-        }
+        results.push(this._listeners[i].apply(null, arguments));
       }
-      return result;
+      return results;
     }
   };
 })();

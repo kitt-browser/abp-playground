@@ -1,6 +1,6 @@
 /*
- * This file is part of Adblock Plus <http://adblockplus.org/>,
- * Copyright (C) 2006-2014 Eyeo GmbH
+ * This file is part of Adblock Plus <https://adblockplus.org/>,
+ * Copyright (C) 2006-2015 Eyeo GmbH
  *
  * Adblock Plus is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -15,70 +15,61 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
-
 var FilterNotifier = require("filterNotifier").FilterNotifier;
+var RegExpFilter = require("filterClasses").RegExpFilter;
 var platform = require("info").platform;
 
-var onFilterChangeTimeout = null;
-function onFilterChange()
+ext.webRequest.indistinguishableTypes.forEach(function(types)
 {
-  onFilterChangeTimeout = null;
-  //KITTHACK
-  ext.webRequest.handlerBehaviorChanged(function() {
-    //console.log('handle behavior changed', arguments);
-  });
-}
+  for (var i = 1; i < types.length; i++)
+    RegExpFilter.typeMap[types[i]] = RegExpFilter.typeMap[types[0]];
+});
 
-var importantNotifications = {
-  'filter.added': true,
-  'filter.removed': true,
-  'filter.disabled': true,
-  'subscription.added': true,
-  'subscription.removed': true,
-  'subscription.disabled': true,
-  'subscription.updated': true,
-  'load': true
-};
-
-FilterNotifier.addListener(function(action)
+FilterNotifier.addListener(function(action, arg)
 {
-  if (action in importantNotifications)
+  switch (action)
   {
-    // Execute delayed to prevent multiple executions in a quick succession
-    if (onFilterChangeTimeout != null)
-      window.clearTimeout(onFilterChangeTimeout);
-    onFilterChangeTimeout = window.setTimeout(onFilterChange, 2000);
+    case "filter.added":
+    case "filter.removed":
+    case "filter.disabled":
+      // Only request blocking/whitelisting filters have
+      // an effect on the webRequest handler behavior.
+      if (!(arg instanceof RegExpFilter))
+        break;
+    case "subscription.added":
+    case "subscription.removed":
+    case "subscription.disabled":
+    case "subscription.updated":
+    case "load":
+      ext.webRequest.handlerBehaviorChanged();
+      break;
   }
 });
 
 function onBeforeRequest(url, type, page, frame)
 {
-  console.log('onBeforeRequest', url, type, page, frame);
   if (isFrameWhitelisted(page, frame))
     return true;
 
-  var docDomain = extractHostFromURL(frame.url);
+  var docDomain = extractHostFromFrame(frame);
+  var key = getKey(page, frame);
   var filter = defaultMatcher.matchesAny(
-    url,
-    type == "sub_frame" ? "SUBDOCUMENT" : type.toUpperCase(),
-    docDomain,
-    isThirdParty(extractHostFromURL(url), docDomain)
+    stringifyURL(url),
+    type, docDomain,
+    isThirdParty(url, docDomain),
+    key
   );
 
   // We can't listen to onHeadersReceived in Safari so we need to
   // check for notifications here
-  /*if (platform != "chromium" && type == "sub_frame")
+  if (platform != "chromium" && type == "SUBDOCUMENT")
   {
-    var notificationToShow = Notification.getNextToShow(url);
+    var notificationToShow = NotificationStorage.getNextToShow(stringifyURL(url));
     if (notificationToShow)
       showNotification(notificationToShow);
-  }*/
+  }
 
-  //console.log('onBeforeRequest filter', url, filter, (filter instanceof BlockingFilter));
-
-  //FilterNotifier.triggerListeners("filter.hitCount", filter, 0, 0, page);
-  console.log("onBeforeRequest return " , url, !(filter instanceof BlockingFilter));
+  FilterNotifier.triggerListeners("filter.hitCount", filter, 0, 0, page);
   return !(filter instanceof BlockingFilter);
 }
 
@@ -86,7 +77,7 @@ ext.webRequest.onBeforeRequest.addListener(onBeforeRequest);
 
 if (platform == "chromium")
 {
-  var onHeadersReceived = function(details)
+  function onHeadersReceived(details)
   {
     if (details.tabId == -1)
       return;
@@ -97,21 +88,20 @@ if (platform == "chromium")
     var page = new ext.Page({id: details.tabId});
     var frame = ext.getFrame(details.tabId, details.frameId);
 
-    if (!frame || frame.url != details.url)
+    if (!frame || frame.url.href != details.url)
       return;
 
     for (var i = 0; i < details.responseHeaders.length; i++)
     {
       var header = details.responseHeaders[i];
       if (header.name.toLowerCase() == "x-adblock-key" && header.value)
-        processKeyException(header.value, page, frame);
+        processKey(header.value, page, frame);
     }
 
-    /*
-    var notificationToShow = Notification.getNextToShow(details.url);
+    var notificationToShow = NotificationStorage.getNextToShow(stringifyURL(new URL(details.url)));
     if (notificationToShow)
-      showNotification(notificationToShow);*/
+      showNotification(notificationToShow);
   }
 
-  chrome.webRequest.onHeadersReceived.addListener(onHeadersReceived, {urls: ["<all_urls>"]}, ["responseHeaders"]);
+  chrome.webRequest.onHeadersReceived.addListener(onHeadersReceived, {urls: ["http://*/*", "https://*/*"]}, ["responseHeaders"]);
 }

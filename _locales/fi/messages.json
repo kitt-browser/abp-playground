@@ -18,7 +18,7 @@
     "message": "Hyväksy muutokset"
   },
   "block_element": {
-    "message": "Estä Elementti"
+    "message": "Estä elementti"
   },
   "cancel": {
     "message": "Peruuta"
@@ -27,16 +27,13 @@
     "message": "Tämän ikkunan sulkemisen jälkeen klikkaa (tai oikea klikkaa) elementtiä jonka haluat estää."
   },
   "description_chrome": {
-    "message": "Ilmainen Adblock työkalu Chromelle: Estää ärsyttävät Youtuben videomainokset, Facebookin mainokset, bannerit ja paljon muuta."
+    "message": "Yli 50 miljoonan ihmisen käyttämä ilmainen mainostenesto-ohjelma Chromelle. Estää KAIKKI mainokset, haittaohjelmat ja seurannan."
   },
   "description_opera": {
-    "message": "Ilmainen Adblock työkalu Operalle: Estää ärsyttävät Youtuben videomainokset, Facebookin mainokset, bannerit ja paljon muuta."
+    "message": "Yli 50 miljoonan ihmisen käyttämä ilmainen mainostenesto-ohjelma Operalle. Estää KAIKKI mainokset, haittaohjelmat ja seurannan."
   },
   "description_safari": {
-    "message": "Ilmainen Adblock työkalu Safarille: Estää ärsyttävät Youtuben videomainokset, Facebookin mainokset, bannerit ja paljon muuta."
-  },
-  "disable_inline": {
-    "message": "Estä tekstimainokset"
+    "message": "Yli 50 miljoonan ihmisen käyttämä ilmainen mainostenesto-ohjelma Safarille. Estää KAIKKI mainokset, haittaohjelmat ja seurannan."
   },
   "disabled_for_site": {
     "message": "<strong>Poistettu</strong> tältä sivulta"
@@ -141,7 +138,7 @@
     "message": "Adblock Plus voi tehdä muutakin kuin vain estää mainoksia"
   },
   "firstRun_filterlistsReinitializedWarning": {
-    "message": "Näyttäisi siltä, että ongelman takia kaikki suodattimet on poistettu ja niiden palauttaminen varmuuskopiosta epäonnistui. Tämän vuoksi kaikki suodattimien ja hyväksyttävien mainoksien asetukset on palautettu alkuarvoihin. Tarkasta suodatinlistat ja hyväksyttävien mainosten asetukset <a>Adblock Plussan asetuksista</a>."
+    "message": "Näyttäisi siltä, että ongelman takia kaikki suodattimet on poistettu ja niiden palauttaminen varmuuskopiosta epäonnistui. Tämän vuoksi kaikki suodattimien ja hyväksyttävien mainosten asetukset on palautettu alkuarvoihin. Tarkasta suodatinlistat ja hyväksyttävien mainosten asetukset <a>Adblock Plussan asetuksista</a>."
   },
   "firstRun_legacySafariWarning": {
     "message": "Käytössäsi on Safarin vanha versio, jota Adblock Plus ei tue. Se ei välttämättä toimi oikein tai saattaa heikentää joidenkin sivustojen käyttökokemusta. Suosittelemme vahvasti päivittämään Safari 6.1.1:een tai uudempaan (OSX 10.8 Mountain Lion), tai Safari 7.0.1:een tai uudempaan (OSX 10.9 Mavericks), tai käyttämään Mozilla Firefoxin, Google Chromen tai Operan uusinta versiota."
@@ -171,7 +168,7 @@
     "message": "Piilotettavalle elementille voidaan määritellä vain yksi tunniste (ID)"
   },
   "global_filter_elemhide_nocriteria": {
-    "message": "Piilotettavaa elementtiä määrittelevää tunnistetta ei annettu"
+    "message": "Piilotettavan elementin määrittävää tunnistetta ei annettu"
   },
   "global_notification_antiadblock_message": {
     "message": "Tämän sivun tiedetään näyttäneen kohdennettuja viestejä Adblock Plussan käyttäjille. Haluatko, että Adblock Plus piilottaa kohdennetut viestit?"
@@ -184,6 +181,14 @@
   },
   "global_subscription_invalid_location": {
     "message": "Suodatinlistan sijainti on joko kelvoton osoite tai tiedoston nimi."
+  },
+  "invalid_css_selector": {
+    "message": "$selector$ ei ole kelvollinen CSS-valitsin",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
   },
   "last_updated_at": {
     "message": "Viimeksi päivitetty $time$ $date$",
@@ -200,6 +205,14 @@
     "message": "Viimeksi päivitetty $time$ tänään",
     "placeholders": {
       "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "line": {
+    "message": "Rivi $number$",
+    "placeholders": {
+      "number": {
         "content": "$1"
       }
     }
@@ -224,9 +237,6 @@
   },
   "out_of_date_lists": {
     "message": "Vanhentuneet listat päivitetään säännöllisesti."
-  },
-  "overlay_hideplaceholders_label": {
-    "message": "Piilota elementit, jotka sisältävät estettyjä elementtejä"
   },
   "overlay_notification_button_close": {
     "message": "Sulje"
@@ -295,6 +305,9 @@
   },
   "subscriptionSelection_title_label": {
     "message": "Tilauksen nimi:"
+  },
+  "unexpected_filter_list_header": {
+    "message": "Suodatin-listan otsakkeet eivät ole sallittuja tässä"
   },
   "update_now": {
     "message": "Päivitä nyt"
