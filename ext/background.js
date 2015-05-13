@@ -565,7 +565,6 @@
     onChanged: chrome.storage.onChanged,
     migratePrefs: function(hooks)
     {
-      /*
       var items = {};
       for (var key in localStorage)
       {
@@ -579,7 +578,7 @@
       {
         localStorage.clear();
         hooks.done();
-      });*/
+      });
     },
     migrateFiles: function(callback)
     {
