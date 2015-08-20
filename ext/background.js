@@ -214,8 +214,7 @@
         {
           tabId: this._tabId,
           path: {
-            19: this._changes.iconPath.replace("$size", "19"),
-            38: this._changes.iconPath.replace("$size", "38")
+            26: this._changes.iconPath.replace("$size", "26"),
           }
         });
       }
