@@ -396,7 +396,8 @@
       }
     }
   };
-  if (parseInt(navigator.userAgent.match(/\bChrome\/(\d+)/)[1], 10) >= 38)
+  var match = navigator.userAgent.match(/\bChrome\/(\d+)/);
+  if (match && parseInt(match[1], 10) >= 38)
   {
     ext.webRequest.indistinguishableTypes = [
       ["OTHER", "OBJECT", "OBJECT_SUBREQUEST"]
@@ -443,64 +444,57 @@
   });
   chrome.webRequest.onBeforeRequest.addListener(function(details)
   {
-    try
+    if (details.tabId == -1)
     {
-      if (details.tabId == -1)
+      return;
+    }
+    var isMainFrame = details.type == "main_frame" || details.frameId == 0 && !(details.tabId in framesOfTabs);
+    var frames = null;
+    if (!isMainFrame)
+    {
+      frames = framesOfTabs[details.tabId];
+    }
+    if (!frames)
+    {
+      frames = framesOfTabs[details.tabId] = Object.create(null);
+    }
+    var frame = null;
+    var url = new URL(details.url);
+    if (!isMainFrame)
+    {
+      var frameId;
+      var requestType;
+      if (details.type == "sub_frame")
       {
-        return;
+        frameId = details.parentFrameId;
+        requestType = "SUBDOCUMENT";
       }
-      var isMainFrame = details.type == "main_frame" || details.frameId == 0 && !(details.tabId in framesOfTabs);
-      var frames = null;
-      if (!isMainFrame)
+      else
       {
-        frames = framesOfTabs[details.tabId];
+        frameId = details.frameId;
+        requestType = details.type.toUpperCase();
       }
-      if (!frames)
+      frame = frames[frameId] || frames[Object.keys(frames)[0]];
+      if (frame)
       {
-        frames = framesOfTabs[details.tabId] = Object.create(null);
-      }
-      var frame = null;
-      var url = new URL(details.url);
-      if (!isMainFrame)
-      {
-        var frameId;
-        var requestType;
-        if (details.type == "sub_frame")
+        var results = ext.webRequest.onBeforeRequest._dispatch(url, requestType, new Page(
         {
-          frameId = details.parentFrameId;
-          requestType = "SUBDOCUMENT";
-        }
-        else
+          id: details.tabId
+        }), frame);
+        if (results.indexOf(false) != -1)
         {
-          frameId = details.frameId;
-          requestType = details.type.toUpperCase();
+          return {
+            cancel: true
+          };
         }
-        frame = frames[frameId] || frames[Object.keys(frames)[0]];
-        if (frame)
-        {
-          var results = ext.webRequest.onBeforeRequest._dispatch(url, requestType, new Page(
-          {
-            id: details.tabId
-          }), frame);
-          if (results.indexOf(false) != -1)
-          {
-            return {
-              cancel: true
-            };
-          }
-        }
-      }
-      if (isMainFrame || details.type == "sub_frame")
-      {
-        frames[details.frameId] = {
-          url: url,
-          parent: frame
-        };
       }
     }
-    catch (e)
+    if (isMainFrame || details.type == "sub_frame")
     {
-      console.error(e);
+      frames[details.frameId] = {
+        url: url,
+        parent: frame
+      };
     }
   },
   {

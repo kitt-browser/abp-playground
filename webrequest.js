@@ -46,6 +46,21 @@ FilterNotifier.addListener(function(action, arg)
   }
 });
 
+function onBeforeRequestAsync(url, type, page, filter)
+{
+  // We can't listen to onHeadersReceived in Safari so we need to
+  // check for notifications here
+  if (platform != "chromium" && type == "SUBDOCUMENT")
+  {
+    var notificationToShow = NotificationStorage.getNextToShow(stringifyURL(url));
+    if (notificationToShow)
+      showNotification(notificationToShow);
+  }
+
+  if (filter)
+    FilterNotifier.triggerListeners("filter.hitCount", filter, 0, 0, page);
+}
+
 function onBeforeRequest(url, type, page, frame)
 {
   if (isFrameWhitelisted(page, frame))
@@ -60,16 +75,8 @@ function onBeforeRequest(url, type, page, frame)
     key
   );
 
-  // We can't listen to onHeadersReceived in Safari so we need to
-  // check for notifications here
-  if (platform != "chromium" && type == "SUBDOCUMENT")
-  {
-    var notificationToShow = NotificationStorage.getNextToShow(stringifyURL(url));
-    if (notificationToShow)
-      showNotification(notificationToShow);
-  }
+  setTimeout(onBeforeRequestAsync, 0, url, type, page, filter);
 
-  FilterNotifier.triggerListeners("filter.hitCount", filter, 0, 0, page);
   return !(filter instanceof BlockingFilter);
 }
 
@@ -79,12 +86,6 @@ if (platform == "chromium")
 {
   function onHeadersReceived(details)
   {
-    if (details.tabId == -1)
-      return;
-
-    if (details.type != "main_frame" && details.type != "sub_frame")
-      return;
-
     var page = new ext.Page({id: details.tabId});
     var frame = ext.getFrame(details.tabId, details.frameId);
 
@@ -103,5 +104,12 @@ if (platform == "chromium")
       showNotification(notificationToShow);
   }
 
-  chrome.webRequest.onHeadersReceived.addListener(onHeadersReceived, {urls: ["http://*/*", "https://*/*"]}, ["responseHeaders"]);
+  chrome.webRequest.onHeadersReceived.addListener(
+    onHeadersReceived,
+    {
+      urls: ["http://*/*", "https://*/*"],
+      types: ["main_frame", "sub_frame"]
+    },
+    ["responseHeaders"]
+  );
 }

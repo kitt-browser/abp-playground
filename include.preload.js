@@ -150,9 +150,14 @@ function convertSelectorsForShadowDOM(selectors)
   for (var i = 0; i < selectors.length; i++)
   {
     var selector = selectors[i];
+    if (selector.indexOf(",") == -1)
+    {
+      result.push(prefix + selector);
+      continue;
+    }
+
     var start = 0;
     var sep = "";
-
     for (var j = 0; j < selector.length; j++)
     {
       var chr = selector[j];
@@ -160,12 +165,15 @@ function convertSelectorsForShadowDOM(selectors)
         j++;
       else if (chr == sep)
         sep = "";
-      else if (chr == '"' || chr == "'")
-        sep = chr;
-      else if (chr == "," && sep == "")
+      else if (sep == "")
       {
-        result.push(prefix + selector.substring(start, j));
-        start = j + 1;
+        if (chr == '"' || chr == "'")
+          sep = chr;
+        else if (chr == ",")
+        {
+          result.push(prefix + selector.substring(start, j));
+          start = j + 1;
+        }
       }
     }
 
